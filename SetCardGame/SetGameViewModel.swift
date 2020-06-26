@@ -29,6 +29,7 @@ class SetGameViewModel: ObservableObject {
     }
     
     func chooseCard(card: SetGame.SetCard) {
+        objectWillChange.send()
         game.touchCard(card)
     }
     

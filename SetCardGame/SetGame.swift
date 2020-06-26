@@ -102,6 +102,7 @@ struct SetGame {
                 gameComments = "FOUND A Match !!!  Excellet!\n"
                 for card in selectedCards {
                     if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
+                        dealtCards[firstIndex].isSelected = !dealtCards[firstIndex].isSelected
                         dealtCards[firstIndex] = deck.removeFirst()
                         dealtCards[firstIndex].cardState = CardGameState.inPlay.rawValue
                     }

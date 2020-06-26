@@ -35,7 +35,9 @@ struct SetCardGameView: View {
                                     card.cardNumber,
                                     shading: card.cardShading,
                                     shapeColor: card.cardColor == "red" ? .red : card.cardColor == "green" ? .green : .purple ).onTapGesture {
-                                        self.viewModel.chooseCard(card: card)
+                                            self.viewModel.chooseCard(card: card)
+                                        
+                                        
                         }
                     
                     }
@@ -69,7 +71,7 @@ struct SetCardGameView: View {
                         
                         // Game Comments
                         ZStack {
-                            RoundedRectangle(cornerRadius: 10).fill(Color.white)
+                            // RoundedRectangle(cornerRadius: 10)
                             RoundedRectangle(cornerRadius: 10).stroke().padding()
                             Text("\(self.viewModel.gameComments)")
                             
@@ -133,7 +135,7 @@ struct SetCardView: View {
                 
                 
             }
-            .background(Color.white)
+            //  .background(Color.white)
             .padding(10) // padding for cardShape
             .foregroundColor(self.shapeColor) // color of shapes
             
