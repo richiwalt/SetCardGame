@@ -51,28 +51,27 @@ struct SetCardGameView: View {
                         
                         VStack {
                             
-                            
+                            Spacer()
                             // New Game
                             Button(action: {
                                 self.viewModel.createNewGame()
-                            }) { Text("Reset Game")}
+                            }) { Text("Reset")}
                             
-                            
-                            
+                            Spacer()
                             // Deal Three Cards
                             Button(action: {
                                 self.viewModel.callModelDealThreeMoreCards()
-                            }) { Text("Deal 3")}
-                            .padding()
-                        
+                            }) { Text("Deal-3")}
+                            
+                            Spacer()
                         }
-                        .padding()
-                        Spacer()
+                        .frame(width: geometry.size.width * 0.2 )
+                        
                         
                         // Game Comments
                         ZStack {
                             // RoundedRectangle(cornerRadius: 10)
-                            RoundedRectangle(cornerRadius: 10).stroke().padding()
+                            RoundedRectangle(cornerRadius: 10).stroke().padding(.trailing)
                             Text("\(self.viewModel.gameComments)")
                             
                         }
@@ -97,6 +96,7 @@ struct SetCardView: View {
     var shading: Double
     var shapeColor: Color
     
+
     var body: some View {
         
         ZStack {

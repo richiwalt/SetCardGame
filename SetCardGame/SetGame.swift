@@ -28,7 +28,7 @@ struct SetGame {
         case red, green, purple
     }
     enum SetShading: Double, CaseIterable {
-        case solid = 1.0, stripped = 0.35, open = 0.0
+        case solid = 1.0, stripped = 0.35, open = 0.02
     }
     enum CardGameState: String {
         case undealt, inPlay, matchedAndDiscarded
@@ -84,16 +84,19 @@ struct SetGame {
         // select/unselect via touch until three cards selected
         if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
             dealtCards[ firstIndex ].isSelected = !dealtCards[ firstIndex ].isSelected
+            gameComments = "\(dealtCards[firstIndex].isSelected ? "Selected:" : "Deselected:") \(card.cardNumber) \(card.cardColor) \(card.cardShape) \n"
         }
         
         // build array of selected cards
         let selectedCards = dealtCards.filter { $0.isSelected }
         
-        // print selected cards
+        // gameComments += "\(selectedCards.count) cards selected\n"
+        
         for (i, card) in selectedCards.enumerated() {
-            gameComments = "\(i):  \(card.cardNumber) \(card.cardColor) \(card.cardShape)\n"
+            gameComments += "Card(\(i+1)): \(card.cardNumber) \(card.cardColor) \(card.cardShape) \n"
         }
         
+                
         // if three are selected ...
         if selectedCards.count == 3 {
             
