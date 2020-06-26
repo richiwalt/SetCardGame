@@ -16,7 +16,24 @@ class SetGameViewModel: ObservableObject {
     
     // MARK: - Access to the Model
     var cards: [SetGame.SetCard] {
-        game.cards
+        game.dealtCards
+    }
+    
+    var gameComments: String {
+        game.gameComments
+    }
+    
+    // MARK: - User Intent(s)
+    func createNewGame() {
+        game = SetGame()
+    }
+    
+    func chooseCard(card: SetGame.SetCard) {
+        game.touchCard(card)
+    }
+    
+    func callModelDealThreeMoreCards() {
+        game.dealThreeMoreCards()
     }
     
 }

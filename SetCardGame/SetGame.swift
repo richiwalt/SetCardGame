@@ -14,7 +14,9 @@ struct SetGame {
 
     
     var gameComments = ""
-    var cards = SetGame.generateSetCardDeck()
+    var deck: [SetCard]
+    var dealtCards = [SetCard]()
+    var discarded = [SetCard]()
 
     enum SetNumber: Int, CaseIterable {
         case one = 1, two = 2, three = 3
@@ -28,9 +30,25 @@ struct SetGame {
     enum SetShading: Double, CaseIterable {
         case solid = 1.0, stripped = 0.35, open = 0.0
     }
+    enum CardGameState: String {
+        case undealt, inPlay, matchedAndDiscarded
+    }
     
+    init() {
+        // get fresh deck of cards
+        deck = SetGame.freshDeckOfCards()
+        
+        // deal cards
+        
+        for index in 0..<12 {
+            dealtCards.append( deck.removeFirst() )
+            dealtCards[index].cardState = CardGameState.inPlay.rawValue
+        }
+
+          
+    }
     
-    static func generateSetCardDeck() -> [SetCard] {
+    static func freshDeckOfCards() -> [SetCard] {
         var deck = [SetCard]()
         var index: Int
 
@@ -38,12 +56,13 @@ struct SetGame {
             for (indexShape, shape) in SetShape.allCases.enumerated() {
                 for (indexColor, color) in SetColor.allCases.enumerated() {
                     for (indexNumber, number) in SetNumber.allCases.enumerated() {
-                        index = indexShading * 27 + indexShape * 9 + indexColor * 3 + indexNumber + 1
+                        index = indexShading * 27 + indexShape * 9 + indexColor * 3 + indexNumber
                         
                         deck.append(SetCard(cardNumber: number.rawValue,
                                             cardShape: shape.rawValue,
                                             cardColor: color.rawValue,
                                             cardShading: shading.rawValue,
+                                            cardState: CardGameState.undealt.rawValue,
                                             id: index))
                         
                     }
@@ -55,9 +74,64 @@ struct SetGame {
         deck.shuffle()
         return deck
     }
+    
+    
+    
+    
+    
+    mutating func touchCard(_ card: SetCard ) {
+        
+        // select/unselect via touch until three cards selected
+        if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
+            dealtCards[ firstIndex ].isSelected = !dealtCards[ firstIndex ].isSelected
+        }
+        
+        // build array of selected cards
+        let selectedCards = dealtCards.filter { $0.isSelected }
+        
+        // print selected cards
+        for (i, card) in selectedCards.enumerated() {
+            gameComments = "\(i):  \(card.cardNumber) \(card.cardColor) \(card.cardShape)\n"
+        }
+        
+        // if three are selected ...
+        if selectedCards.count == 3 {
+            
+            if checkCards(forSetMatch: selectedCards ) == true {
+                // cards were a match, replace them with dealt cards from the deck
+                gameComments = "FOUND A Match !!!  Excellet!\n"
+                for card in selectedCards {
+                    if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
+                        dealtCards[firstIndex] = deck.removeFirst()
+                        dealtCards[firstIndex].cardState = CardGameState.inPlay.rawValue
+                    }
+                }
+                
+            } else {
+                // cards were not a match ... unmark them as selected
+                for card in selectedCards {
+                    if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
+                        dealtCards[firstIndex].isSelected = !dealtCards[firstIndex].isSelected
+                    }
+                }
+            }
+        }
+        
+        
+        // gameComments += "Card\(card.id): \(card.cardNumber), \(card.cardShape) \(card.cardColor) \(card.cardShading)\n"
+    }
 
+    
+    
+    
+    mutating func dealThreeMoreCards() {
+        for index in 0..<3 {
+            dealtCards.append( deck.removeFirst() )
+            dealtCards[index].cardState = CardGameState.inPlay.rawValue
+        }
+    }
 
-    mutating func checkSettable(_ cards: [SetCard] ) -> Bool {
+    mutating func checkCards(forSetMatch cards: [SetCard] ) -> Bool {
         gameComments = ""
         var numberSettable = true
         var colorSettable = true
@@ -65,28 +139,28 @@ struct SetGame {
         var shadingSettable = true
         for number in SetNumber.allCases {
             if ( cards.filter { $0.cardNumber == number.rawValue }.isNotASet) {
-                gameComments += "fails settable: exactly two: \(number.rawValue)"
+                gameComments += "two \(number.rawValue)'s\n"
                 numberSettable = false
                 break
             }
         }
         for color in SetColor.allCases {
             if ( cards.filter { $0.cardColor == color.rawValue }.isNotASet)  {
-                gameComments += "fails settable: exactly two: \(color.rawValue.uppercased())"
+                gameComments += "two \(color.rawValue.uppercased())'s\n"
                 colorSettable = false
                 break
             }
         }
         for shape in SetShape.allCases {
             if ( cards.filter { $0.cardShape == shape.rawValue }.isNotASet)  {
-                gameComments += "fails settable: exactly two: \(shape.rawValue.uppercased())"
+                gameComments += "two \(shape.rawValue.uppercased())'s\n"
                 shapeSettable = false
                 break
             }
         }
         for shading in SetShading.allCases {
             if ( cards.filter { $0.cardShading == shading.rawValue }.isNotASet)  {
-                gameComments += "fails settable: exactly two: \(shading.rawValue)"
+                gameComments += "two: \(shading.rawValue)'s\n"
                 shadingSettable = false
                 break
             }
@@ -97,12 +171,19 @@ struct SetGame {
     
     
     struct SetCard: Identifiable {
+        
+        // Pure Model Attributes
         let cardNumber: Int
         let cardShape: String
         let cardColor: String
         let cardShading: Double
+        
+        // Playing Attributes
+        var cardState: String
         var isSelected = false
-        var isOnTable = false
+        var isMatched = false
+        
+        // iOS Attributes
         let id: Int
     }
     

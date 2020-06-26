@@ -21,9 +21,12 @@ struct SetCardGameView: View {
     var body: some View {
         
         ZStack {
+            
             GeometryReader { geometry in
                 
                 VStack {
+                    
+                    Spacer()
                     
                     Grid(self.viewModel.cards) { card in
                         SetCardView(viewModel: self.viewModel,
@@ -31,14 +34,56 @@ struct SetCardGameView: View {
                                     cardPips:
                                     card.cardNumber,
                                     shading: card.cardShading,
-                                    color: card.cardColor == "red" ? .red : card.cardColor == "green" ? .green : .purple )
-                    }
+                                    shapeColor: card.cardColor == "red" ? .red : card.cardColor == "green" ? .green : .purple ).onTapGesture {
+                                        self.viewModel.chooseCard(card: card)
+                        }
                     
+                    }
+                
+                    .frame(width: geometry.size.width, height: geometry.size.height * 0.85 )
+                    
+                    Spacer()
+                    
+                    // Bottom Menue
+                    HStack {
+                        
+                        VStack {
+                            
+                            
+                            // New Game
+                            Button(action: {
+                                self.viewModel.createNewGame()
+                            }) { Text("Reset Game")}
+                            
+                            
+                            
+                            // Deal Three Cards
+                            Button(action: {
+                                self.viewModel.callModelDealThreeMoreCards()
+                            }) { Text("Deal 3")}
+                            .padding()
+                        
+                        }
+                        .padding()
+                        Spacer()
+                        
+                        // Game Comments
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10).fill(Color.white)
+                            RoundedRectangle(cornerRadius: 10).stroke().padding()
+                            Text("\(self.viewModel.gameComments)")
+                            
+                        }
+                        
+                        
+                    }
                 }
+                // .background(Color.green)
             }
         }
     }
 }
+
 
 
 
@@ -48,19 +93,21 @@ struct SetCardView: View {
     var card: SetGame.SetCard
     var cardPips: Int
     var shading: Double
-    var color: Color
+    var shapeColor: Color
     
     var body: some View {
         
         ZStack {
             
             VStack {
+                
                 if card.cardShape == "diamond" {
                     ForEach( 0..<cardPips ) { _ in
                         ZStack {
                             SetDiamond().opacity(self.card.cardShading)
                             SetDiamond().stroke()
                         }
+                    
                         //.aspectRatio(2.0, contentMode: .fit)
                     }
                 }
@@ -83,12 +130,19 @@ struct SetCardView: View {
                         //.aspectRatio(3.0, contentMode: .fit)
                     }
                 }
-
+                
+                
             }
-            .padding()
-            .foregroundColor(self.color)
-        
+            .background(Color.white)
+            .padding(10) // padding for cardShape
+            .foregroundColor(self.shapeColor) // color of shapes
+            
+                        RoundedRectangle(cornerRadius: 10).stroke().foregroundColor(Color.orange)
+            // RoundedRectangle of entire VStack (a card)
+            
         }
+        .padding(5) // padding between cards
+        
     }
 }
 
