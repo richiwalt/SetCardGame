@@ -13,11 +13,11 @@
 		55614D7324A522180041EA26 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 55614D7224A522180041EA26 /* Assets.xcassets */; };
 		55614D7624A522180041EA26 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 55614D7524A522180041EA26 /* Preview Assets.xcassets */; };
 		55614D7924A522180041EA26 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 55614D7724A522180041EA26 /* LaunchScreen.storyboard */; };
-		55614D8124A527990041EA26 /* SetCardShapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55614D8024A527990041EA26 /* SetCardShapes.swift */; };
 		55614D8324A557D30041EA26 /* SetGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55614D8224A557D30041EA26 /* SetGame.swift */; };
 		55C007C124A57CAE00820D03 /* GridLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55C007C024A57CAE00820D03 /* GridLayout.swift */; };
 		55C007C324A57D1600820D03 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55C007C224A57D1600820D03 /* Grid.swift */; };
 		55C007C524A57EE900820D03 /* SetGameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55C007C424A57EE900820D03 /* SetGameViewModel.swift */; };
+		55C007C724A638DE00820D03 /* SetCardShapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55C007C624A638DE00820D03 /* SetCardShapes.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,11 +29,11 @@
 		55614D7524A522180041EA26 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		55614D7824A522180041EA26 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		55614D7A24A522180041EA26 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		55614D8024A527990041EA26 /* SetCardShapes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetCardShapes.swift; sourceTree = SOURCE_ROOT; };
 		55614D8224A557D30041EA26 /* SetGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGame.swift; sourceTree = "<group>"; };
 		55C007C024A57CAE00820D03 /* GridLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridLayout.swift; sourceTree = "<group>"; };
 		55C007C224A57D1600820D03 /* Grid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grid.swift; sourceTree = "<group>"; };
 		55C007C424A57EE900820D03 /* SetGameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameViewModel.swift; sourceTree = "<group>"; };
+		55C007C624A638DE00820D03 /* SetCardShapes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetCardShapes.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +66,7 @@
 		55614D6B24A522170041EA26 /* SetCardGame */ = {
 			isa = PBXGroup;
 			children = (
+				55C007C624A638DE00820D03 /* SetCardShapes.swift */,
 				55614D6C24A522170041EA26 /* AppDelegate.swift */,
 				55614D6E24A522170041EA26 /* SceneDelegate.swift */,
 				55614D7024A522170041EA26 /* SetCardGameView.swift */,
@@ -74,7 +75,6 @@
 				55C007C024A57CAE00820D03 /* GridLayout.swift */,
 				55C007C224A57D1600820D03 /* Grid.swift */,
 				55614D7224A522180041EA26 /* Assets.xcassets */,
-				55614D8024A527990041EA26 /* SetCardShapes.swift */,
 				55614D7724A522180041EA26 /* LaunchScreen.storyboard */,
 				55614D7A24A522180041EA26 /* Info.plist */,
 				55614D7424A522180041EA26 /* Preview Content */,
@@ -161,7 +161,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				55614D8124A527990041EA26 /* SetCardShapes.swift in Sources */,
+				55C007C724A638DE00820D03 /* SetCardShapes.swift in Sources */,
 				55614D6D24A522170041EA26 /* AppDelegate.swift in Sources */,
 				55614D8324A557D30041EA26 /* SetGame.swift in Sources */,
 				55C007C524A57EE900820D03 /* SetGameViewModel.swift in Sources */,
