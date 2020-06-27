@@ -65,6 +65,7 @@ struct SetCardGameView: View {
                             }) { Text("Deal 3")}
                             .padding()
                         
+                            Text("Score: \(self.viewModel.score)")
                         }
                         .padding()
                         Spacer()

@@ -14,6 +14,7 @@ struct SetGame {
 
     
     var gameComments = ""
+    var score: Int = 0
     var deck: [SetCard]
     var dealtCards = [SetCard]()
     var discarded = [SetCard]()
@@ -98,14 +99,17 @@ struct SetGame {
         if selectedCards.count == 3 {
             
             if checkCards(forSetMatch: selectedCards ) == true {
+                score += 1
                 // cards were a match, replace them with dealt cards from the deck
                 gameComments = "FOUND A Match !!!  Excellet!\n"
                 for card in selectedCards {
                     if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
+                        // need to transfer matched cards into discarded cards ...
                         dealtCards[firstIndex].isSelected = !dealtCards[firstIndex].isSelected
-                        dealtCards[firstIndex] = deck.removeFirst()
+                        dealtCards[firstIndex] = deck.removeFirst() // TODO: check there is a first card 
                         dealtCards[firstIndex].cardState = CardGameState.inPlay.rawValue
                     }
+                    // double check that deck.count + dealtCards.count + discarded.count == 81 
                 }
                 
             } else {
@@ -113,6 +117,7 @@ struct SetGame {
                 for card in selectedCards {
                     if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
                         dealtCards[firstIndex].isSelected = !dealtCards[firstIndex].isSelected
+                        
                     }
                 }
             }
@@ -126,10 +131,13 @@ struct SetGame {
     
     
     mutating func dealThreeMoreCards() {
+      // FIX:  first ... check deck.count >= 3
         for index in 0..<3 {
             dealtCards.append( deck.removeFirst() )
             dealtCards[index].cardState = CardGameState.inPlay.rawValue
         }
+        
+        gameComments = "\(deck.count) cards in deck; \(dealtCards.count) cards in play; \(disgarded.count) discarded cards"
     }
 
     mutating func checkCards(forSetMatch cards: [SetCard] ) -> Bool {
