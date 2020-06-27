@@ -140,7 +140,7 @@ struct SetGame {
             dealtCards[index].cardState = CardGameState.inPlay.rawValue
         }
         
-        gameComments = "\(deck.count) cards in deck; \(dealtCards.count) cards in play; \(disgarded.count) discarded cards"
+        gameComments = "\(deck.count) cards in deck; \(dealtCards.count) cards in play; \(discarded.count) discarded cards"
     }
 
     mutating func checkCards(forSetMatch cards: [SetCard] ) -> Bool {
