@@ -19,6 +19,10 @@ class SetGameViewModel: ObservableObject {
         game.dealtCards
     }
     
+    var score: Int {
+        game.score
+    }
+    
     var gameComments: String {
         game.gameComments
     }
