@@ -134,13 +134,15 @@ struct SetGame {
     
     
     mutating func dealThreeMoreCards() {
-      // FIX:  first ... check deck.count >= 3
-        for index in 0..<3 {
-            dealtCards.append( deck.removeFirst() )
-            dealtCards[index].cardState = CardGameState.inPlay.rawValue
+        
+        if deck.count >= 3 {
+            for index in 0..<3 {
+                dealtCards.append( deck.removeFirst() )
+                dealtCards[index].cardState = CardGameState.inPlay.rawValue
+            }
         }
         
-        gameComments = "\(deck.count) cards in deck; \(dealtCards.count) cards in play; \(discarded.count) discarded cards"
+        gameComments = "\(deck.count) remaining; \(dealtCards.count) in play; \(discarded.count)/27 matches"
     }
 
     mutating func checkCards(forSetMatch cards: [SetCard] ) -> Bool {
