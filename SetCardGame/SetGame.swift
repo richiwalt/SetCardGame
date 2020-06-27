@@ -102,19 +102,33 @@ struct SetGame {
         if selectedCards.count == 3 {
             
             if checkCards(forSetMatch: selectedCards ) == true {
-                score += 1
-                // cards were a match, replace them with dealt cards from the deck
                 gameComments = "FOUND A Match !!!  Excellet!\n"
-                for card in selectedCards {
-                    if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
-                        // need to transfer matched cards into discarded cards ...
-                        dealtCards[firstIndex].isSelected = !dealtCards[firstIndex].isSelected
-                        dealtCards[firstIndex] = deck.removeFirst() // TODO: check there is a first card 
-                        dealtCards[firstIndex].cardState = CardGameState.inPlay.rawValue
-                    }
-                    // double check that deck.count + dealtCards.count + discarded.count == 81 
-                }
+                score += 1
                 
+                // cards were a match, replace them with dealt cards from the deck if available
+                
+                if deck.count >= 3 {
+                    for card in selectedCards {
+                        if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
+                            // need to transfer matched cards into discarded cards ...
+                            dealtCards[firstIndex].isSelected = !dealtCards[firstIndex].isSelected
+                            dealtCards[firstIndex] = deck.removeFirst() // TODO: check there is a first card
+                            dealtCards[firstIndex].cardState = CardGameState.inPlay.rawValue
+                        }
+                        // double check that deck.count + dealtCards.count + discarded.count == 81
+                    }
+
+                } else {
+                   // no more cards in deck ... but we need to remove these matched cards anyway ...
+                   for card in selectedCards {
+                        if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
+                            dealtCards[firstIndex].isSelected = !dealtCards[firstIndex].isSelected
+                            dealtCards.remove(at: firstIndex)
+                        }
+                        // double check that deck.count + dealtCards.count + discarded.count == 81
+                    }
+                }
+                                
             } else {
                 // cards were not a match ... unmark them as selected
                 for card in selectedCards {
