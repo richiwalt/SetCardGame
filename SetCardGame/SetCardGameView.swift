@@ -8,9 +8,38 @@
 
 import SwiftUI
 
-
+/*
 enum CardShape: String {
     case diamond, squiggle, circle
+}
+*/
+
+
+struct AnyShape: Shape {
+    
+    func path(in rect: CGRect) -> Path {
+        return _path(rect)
+    }
+    
+    init<S: Shape>(_ wrapped: S) {
+        _path = { rect in
+            let path = wrapped.path(in: rect)
+            return path
+        }
+    }
+    private let _path: (CGRect) -> Path
+}
+
+
+func getShape(_ shape: SetCardShape ) -> some Shape {
+    switch shape {
+    case .circle:
+        return AnyShape( Circle() )
+    case .diamond:
+        return AnyShape( SetDiamond() )
+    case .squiggle:
+        return AnyShape( SetSquiggle() )
+    }
 }
 
 
@@ -28,21 +57,25 @@ struct SetCardGameView: View {
                     
                     Spacer()
                     
-                    Grid(self.viewModel.cards) { card in
-                        SetCardView(viewModel: self.viewModel,
-                                    card: card,
-                                    cardPips:
-                                    card.cardNumber,
-                                    shading: card.cardShading,
-                                    shapeColor: card.cardColor == "red" ? .red : card.cardColor == "green" ? .green : .purple ).onTapGesture {
-                                            self.viewModel.chooseCard(card: card)
-                                        
-                                        
-                        }
+                    //SetCard(pips: 2, shape: .squiggle, color: .purple, shading: SetShading.striped.rawValue)
                     
+                    Grid(self.viewModel.cards) { card in
+                        
+                        SetCard(pips: card.pips,
+                                shape: card.shape,
+                                color: card.color,
+                                shading: card.shading, isSelected: card.isSelected
+                        )
+                        
+                        .onTapGesture {
+                            withAnimation(.easeInOut(duration: 0.40)) {
+                                self.viewModel.touch(viewCard: card)
+                            }
+                            
+                        }
                     }
-                
-                    .frame(width: geometry.size.width, height: geometry.size.height * 0.85 )
+                        
+                    .frame(width: geometry.size.width, height: geometry.size.height * 0.75 )
                     
                     Spacer()
                     
@@ -51,21 +84,36 @@ struct SetCardGameView: View {
                         
                         VStack {
                             
-                            
                             // New Game
                             Button(action: {
-                                self.viewModel.createNewGame()
+                                withAnimation(.easeInOut(duration: 2.0)) {
+                                    self.viewModel.createNewGame()
+                                }
+                                
                             }) { Text("Reset Game")}
-                            
-                            
+                            Spacer()
                             
                             // Deal Three Cards
                             Button(action: {
-                                self.viewModel.callModelDealThreeMoreCards()
+                                withAnimation(.easeInOut(duration: 0.85)) {
+                                    self.viewModel.callModelDealThreeMoreCards()
+                                }
+                                
                             }) { Text("Deal 3")}
-                            .padding()
-                        
-                            Text("Score: \(self.viewModel.score)")
+                            Spacer()
+                            
+                            // Rearrange
+                            Button(action: {
+                                withAnimation(.easeIn(duration: 0.85)) {
+                                    self.viewModel.rearrangeCardsForView()
+                                }
+                                
+                            }) { Text("Rearrange")}
+                            Spacer()
+                            
+                                // Score
+                            Text("Matches: \(self.viewModel.score)/27")
+                            
                         }
                         .padding()
                         Spacer()
@@ -73,79 +121,45 @@ struct SetCardGameView: View {
                         // Game Comments
                         ZStack {
                             // RoundedRectangle(cornerRadius: 10)
-                            RoundedRectangle(cornerRadius: 10).stroke().padding()
+                            RoundedRectangle(cornerRadius: 10).stroke()
                             Text("\(self.viewModel.gameComments)")
                             
                         }
-                        
-                        
                     }
                 }
                 // .background(Color.green)
             }
+        .padding()
         }
     }
 }
 
 
 
-
-struct SetCardView: View {
+struct SetCard: View {
     
-    @ObservedObject var viewModel: SetGameViewModel
-    var card: SetGame.SetCard
-    var cardPips: Int
-    var shading: Double
-    var shapeColor: Color
+    let pips: Int
+    let shape: SetCardShape
+    let color: Color
+    let shading: Double
+    let isSelected: Bool
     
     var body: some View {
-        
         ZStack {
-            
             VStack {
-                
-                if card.cardShape == "diamond" {
-                    ForEach( 0..<cardPips ) { _ in
-                        ZStack {
-                            SetDiamond().opacity(self.card.cardShading)
-                            SetDiamond().stroke()
-                        }
-                    
-                        //.aspectRatio(2.0, contentMode: .fit)
+                ForEach( 0..<pips ) { _ in
+                    ZStack {
+                        getShape( self.shape ).opacity(self.shading).foregroundColor(self.color)
+                        getShape( self.shape ).stroke().foregroundColor(self.color)
                     }
                 }
-
-                if card.cardShape == "oval" {
-                    ForEach( 0..<cardPips ) { _ in
-                        ZStack {
-                            Circle().opacity(self.card.cardShading)
-                            Circle().stroke()
-                        }
-                        //.aspectRatio(2.0, contentMode: .fit)
-                    }
-                }
-                if card.cardShape == "squiggle" {
-                    ForEach( 0..<cardPips ) { _ in
-                        ZStack {
-                            SetSquiggle().opacity(self.card.cardShading)
-                            SetSquiggle().stroke()
-                        }
-                        //.aspectRatio(3.0, contentMode: .fit)
-                    }
-                }
-                
-                
             }
-            //  .background(Color.white)
-            .padding(10) // padding for cardShape
-            .foregroundColor(self.shapeColor) // color of shapes
-            
-                        RoundedRectangle(cornerRadius: 10).stroke().foregroundColor(Color.orange)
-            // RoundedRectangle of entire VStack (a card)
-            
+            .padding()
+            RoundedRectangle(cornerRadius: 10).stroke(lineWidth: isSelected ? 3.0 : 1.0).foregroundColor(.orange)
+                
         }
-        .padding(5) // padding between cards
-        
+    .scaleEffect(isSelected ? 0.60 : 1.0 )
+    .padding(5)
     }
 }
 

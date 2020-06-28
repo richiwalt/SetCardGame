@@ -11,25 +11,25 @@ import Foundation
 
 
 struct SetGame {
-
     
     var gameComments = ""
     var score: Int = 0
     var deck: [SetCard]
+    static var tryAgain: Bool = false
     var dealtCards = [SetCard]()
-    var discarded = [SetCard]()
-
-    enum SetNumber: Int, CaseIterable {
-        case one = 1, two = 2, three = 3
+    var discarded = [SetCard]()  // TODO: may not even need this
+    
+    enum SetNumber: String, CaseIterable {
+        case one, two, three
     }
     enum SetShape: String, CaseIterable {
-         case diamond, squiggle, oval
+        case diamond, squiggle, oval
     }
     enum SetColor: String, CaseIterable {
         case red, green, purple
     }
-    enum SetShading: Double, CaseIterable {
-        case solid = 1.0, stripped = 0.35, open = 0.02
+    enum SetShading: String, CaseIterable {
+        case solid, stripped, open
     }
     enum CardGameState: String {
         case undealt, inPlay, matchedAndDiscarded
@@ -40,19 +40,16 @@ struct SetGame {
         deck = SetGame.freshDeckOfCards()
         
         // deal cards
-        
         for index in 0..<12 {
             dealtCards.append( deck.removeFirst() )
             dealtCards[index].cardState = CardGameState.inPlay.rawValue
         }
-
-          
     }
     
     static func freshDeckOfCards() -> [SetCard] {
         var deck = [SetCard]()
         var index: Int
-
+        
         for (indexShading, shading) in SetShading.allCases.enumerated() {
             for (indexShape, shape) in SetShape.allCases.enumerated() {
                 for (indexColor, color) in SetColor.allCases.enumerated() {
@@ -70,43 +67,62 @@ struct SetGame {
                 }
             }
         }
-
         deck.shuffle()
         deck.shuffle()
         return deck
     }
     
     
+    mutating func rearrangeDealtCards() {
+        dealtCards.shuffle()
+    }
     
     
+    // Utility Function to Deselect all Selected Gards ...
+    // Called when SetGame.tryAgain is true
+    mutating func deselectAllSelected() {
+        let selectedCards = dealtCards.filter { $0.isSelected }
+        for selected in selectedCards {
+            if let index = dealtCards.firstIndex(where: { $0.id == selected.id }) {
+                dealtCards[index].isSelected = !dealtCards[index].isSelected
+            }
+        }
+        SetGame.tryAgain = false
+    }
     
-    mutating func touchCard(_ card: SetCard ) {
+    
+    // The Heart of Game Logic ... perform actions when a card is selected
+    mutating func select(card: SetCard ) {
+        
+        // Start Fresh if SetGame.tryAgain is true
+        if SetGame.tryAgain == true {
+            deselectAllSelected()
+        }
+        
+        gameComments = ""
         
         // select/unselect via touch until three cards selected
         if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
             dealtCards[ firstIndex ].isSelected = !dealtCards[ firstIndex ].isSelected
-            gameComments = "\(dealtCards[firstIndex].isSelected ? "Selected:" : "Deselected:") \(card.cardNumber) \(card.cardColor) \(card.cardShape) \n"
+            // print statement below for debugging only ...
+            // gameComments = "\(dealtCards[firstIndex].isSelected ? "Selected:" : "Deselected:") \(card.cardNumber.capitalized)-\(card.cardColor.capitalized)-\(card.cardShape.capitalized)-\(card.cardShading.capitalized)\n\n"
         }
         
         // build array of selected cards
         let selectedCards = dealtCards.filter { $0.isSelected }
         
-        // gameComments += "\(selectedCards.count) cards selected\n"
-        
         for (i, card) in selectedCards.enumerated() {
-            gameComments += "Card(\(i+1)): \(card.cardNumber) \(card.cardColor) \(card.cardShape) \n"
+            gameComments += "Card(\(i+1)): \(card.cardNumber.capitalized)-\(card.cardColor.capitalized)-\(card.cardShape.capitalized)-\(card.cardShading.capitalized) \n"
         }
         
-                
         // if three are selected ...
         if selectedCards.count == 3 {
             
             if checkCards(forSetMatch: selectedCards ) == true {
-                gameComments = "FOUND A Match !!!  Excellet!\n"
+                gameComments = "FOUND A Match !!!  Excellent!   \n"
                 score += 1
                 
                 // cards were a match, replace them with dealt cards from the deck if available
-                
                 if deck.count >= 3 {
                     for card in selectedCards {
                         if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
@@ -117,48 +133,34 @@ struct SetGame {
                         }
                         // double check that deck.count + dealtCards.count + discarded.count == 81
                     }
-
+                    
                 } else {
-                   // no more cards in deck ... but we need to remove these matched cards anyway ...
-                   for card in selectedCards {
+                    // no more cards in deck ... just remove these matched cards ...
+                    for card in selectedCards {
                         if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
                             dealtCards[firstIndex].isSelected = !dealtCards[firstIndex].isSelected
                             dealtCards.remove(at: firstIndex)
                         }
-                        // double check that deck.count + dealtCards.count + discarded.count == 81
                     }
                 }
-                                
+                
             } else {
-                // cards were not a match ... unmark them as selected
-                for card in selectedCards {
-                    if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
-                        dealtCards[firstIndex].isSelected = !dealtCards[firstIndex].isSelected
-                        
-                    }
-                }
+                // cards were not a match ...
+                
             }
         }
-        
-        
-        // gameComments += "Card\(card.id): \(card.cardNumber), \(card.cardShape) \(card.cardColor) \(card.cardShading)\n"
     }
-
-    
-    
     
     mutating func dealThreeMoreCards() {
-        
         if deck.count >= 3 {
             for index in 0..<3 {
                 dealtCards.append( deck.removeFirst() )
                 dealtCards[index].cardState = CardGameState.inPlay.rawValue
             }
         }
-        
         gameComments = "\(deck.count) remaining; \(dealtCards.count) in play; \(discarded.count)/27 matches"
     }
-
+    
     mutating func checkCards(forSetMatch cards: [SetCard] ) -> Bool {
         gameComments = ""
         var numberSettable = true
@@ -167,44 +169,48 @@ struct SetGame {
         var shadingSettable = true
         for number in SetNumber.allCases {
             if ( cards.filter { $0.cardNumber == number.rawValue }.isNotASet) {
-                gameComments += "two \(number.rawValue)'s\n"
+                gameComments += "two \(number.rawValue.uppercased())'s; "
                 numberSettable = false
                 break
             }
         }
         for color in SetColor.allCases {
             if ( cards.filter { $0.cardColor == color.rawValue }.isNotASet)  {
-                gameComments += "two \(color.rawValue.uppercased())'s\n"
+                gameComments += "two \(color.rawValue.uppercased())'s; "
                 colorSettable = false
                 break
             }
         }
         for shape in SetShape.allCases {
             if ( cards.filter { $0.cardShape == shape.rawValue }.isNotASet)  {
-                gameComments += "two \(shape.rawValue.uppercased())'s\n"
+                gameComments += "two \(shape.rawValue.uppercased())'s; "
                 shapeSettable = false
                 break
             }
         }
         for shading in SetShading.allCases {
             if ( cards.filter { $0.cardShading == shading.rawValue }.isNotASet)  {
-                gameComments += "two: \(shading.rawValue)'s\n"
+                gameComments += "two: \(shading.rawValue.uppercased())'s; "
                 shadingSettable = false
                 break
             }
         }
+        
+        if !(numberSettable && colorSettable && shapeSettable && shadingSettable) {
+            SetGame.tryAgain = true
+            gameComments = "Not a Match:\n  \(gameComments)\n"
+        }
+        
         return numberSettable && colorSettable && shapeSettable && shadingSettable
     }
-
-    
     
     struct SetCard: Identifiable {
         
         // Pure Model Attributes
-        let cardNumber: Int
+        let cardNumber: String
         let cardShape: String
         let cardColor: String
-        let cardShading: Double
+        let cardShading: String
         
         // Playing Attributes
         var cardState: String
@@ -214,7 +220,6 @@ struct SetGame {
         // iOS Attributes
         let id: Int
     }
-    
     
 }
 
