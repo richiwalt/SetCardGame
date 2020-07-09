@@ -31,7 +31,7 @@ struct AnyShape: Shape {
 }
 
 
-func getShape(_ shape: SetCardShape ) -> some Shape {
+func getShape(_ shape: ViewCardShape ) -> some Shape {
     switch shape {
     case .circle:
         return AnyShape( Circle() )
@@ -51,6 +51,8 @@ struct SetCardGameView: View {
         
         ZStack {
             
+            (LinearGradient(gradient: Gradient(colors: [.yellow, .orange, .red, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing)).edgesIgnoringSafeArea(.all)
+
             GeometryReader { geometry in
                 
                 VStack {
@@ -61,21 +63,16 @@ struct SetCardGameView: View {
                     
                     Grid(self.viewModel.cards) { card in
                         
-                        SetCard(pips: card.pips,
-                                shape: card.shape,
-                                color: card.color,
-                                shading: card.shading, isSelected: card.isSelected
-                        )
-                        
-                        .onTapGesture {
-                            withAnimation(.easeInOut(duration: 0.40)) {
-                                self.viewModel.touch(viewCard: card)
+                        SetCard(card: card)
+                
+                            .onTapGesture {
+                                withAnimation {
+                                    self.viewModel.touch(viewCard: card)
+                                }
                             }
-                            
-                        }
                     }
                         
-                    .frame(width: geometry.size.width, height: geometry.size.height * 0.75 )
+                    .frame(width: geometry.size.width, height: geometry.size.height * 0.85 )
                     
                     Spacer()
                     
@@ -86,45 +83,45 @@ struct SetCardGameView: View {
                             
                             // New Game
                             Button(action: {
-                                withAnimation(.easeInOut(duration: 2.0)) {
+                                withAnimation(.easeInOut(duration: 0.75)) {
                                     self.viewModel.createNewGame()
                                 }
                                 
                             }) { Text("Reset Game")}
+                                .foregroundColor(.primary)
                             Spacer()
                             
                             // Deal Three Cards
                             Button(action: {
-                                withAnimation(.easeInOut(duration: 0.85)) {
                                     self.viewModel.callModelDealThreeMoreCards()
-                                }
                                 
                             }) { Text("Deal 3")}
+                            .foregroundColor(.primary)
                             Spacer()
                             
                             // Rearrange
                             Button(action: {
-                                withAnimation(.easeIn(duration: 0.85)) {
-                                    self.viewModel.rearrangeCardsForView()
-                                }
+                                // withAnimation(.easeIn(duration: 0.85)) {
+                                self.viewModel.rearrangeCardsForView()
+                                // }
                                 
                             }) { Text("Rearrange")}
+                            .foregroundColor(.primary)
                             Spacer()
                             
-                                // Score
-                            Text("Matches: \(self.viewModel.score)/27")
+                            // Score
+                            Text("Matches: \(self.viewModel.score)/27").animation(.none)
+                                .foregroundColor(.white)
                             
                         }
                         .padding()
                         Spacer()
                         
                         // Game Comments
-                        ZStack {
-                            // RoundedRectangle(cornerRadius: 10)
-                            RoundedRectangle(cornerRadius: 10).stroke()
-                            Text("\(self.viewModel.gameComments)")
-                            
-                        }
+                            Text("\(self.viewModel.gameComments)").animation(.none)
+                                .font(.callout)
+                                .multilineTextAlignment(.leading)
+                                .foregroundColor(.white)
                     }
                 }
                 // .background(Color.green)
@@ -138,28 +135,14 @@ struct SetCardGameView: View {
 
 struct SetCard: View {
     
-    let pips: Int
-    let shape: SetCardShape
-    let color: Color
-    let shading: Double
-    let isSelected: Bool
+    let card: CardForView
     
     var body: some View {
+        
         ZStack {
-            VStack {
-                ForEach( 0..<pips ) { _ in
-                    ZStack {
-                        getShape( self.shape ).opacity(self.shading).foregroundColor(self.color)
-                        getShape( self.shape ).stroke().foregroundColor(self.color)
-                    }
-                }
-            }
-            .padding()
-            RoundedRectangle(cornerRadius: 10).stroke(lineWidth: isSelected ? 3.0 : 1.0).foregroundColor(.orange)
-                
+            getShape( self.card.shape )
+                .cardify(card: self.card)
         }
-    .scaleEffect(isSelected ? 0.60 : 1.0 )
-    .padding(5)
     }
 }
 

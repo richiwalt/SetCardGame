@@ -18,6 +18,7 @@
 		55C007C324A57D1600820D03 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55C007C224A57D1600820D03 /* Grid.swift */; };
 		55C007C524A57EE900820D03 /* SetGameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55C007C424A57EE900820D03 /* SetGameViewModel.swift */; };
 		55C007C724A638DE00820D03 /* SetCardShapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55C007C624A638DE00820D03 /* SetCardShapes.swift */; };
+		55C9F16424B61E7500854C02 /* Cardify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55C9F16324B61E7500854C02 /* Cardify.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		55C007C224A57D1600820D03 /* Grid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Grid.swift; sourceTree = "<group>"; };
 		55C007C424A57EE900820D03 /* SetGameViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameViewModel.swift; sourceTree = "<group>"; };
 		55C007C624A638DE00820D03 /* SetCardShapes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetCardShapes.swift; sourceTree = "<group>"; };
+		55C9F16324B61E7500854C02 /* Cardify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cardify.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +72,7 @@
 				55614D6C24A522170041EA26 /* AppDelegate.swift */,
 				55614D6E24A522170041EA26 /* SceneDelegate.swift */,
 				55614D7024A522170041EA26 /* SetCardGameView.swift */,
+				55C9F16324B61E7500854C02 /* Cardify.swift */,
 				55C007C424A57EE900820D03 /* SetGameViewModel.swift */,
 				55614D8224A557D30041EA26 /* SetGame.swift */,
 				55C007C024A57CAE00820D03 /* GridLayout.swift */,
@@ -164,6 +167,7 @@
 				55C007C724A638DE00820D03 /* SetCardShapes.swift in Sources */,
 				55614D6D24A522170041EA26 /* AppDelegate.swift in Sources */,
 				55614D8324A557D30041EA26 /* SetGame.swift in Sources */,
+				55C9F16424B61E7500854C02 /* Cardify.swift in Sources */,
 				55C007C524A57EE900820D03 /* SetGameViewModel.swift in Sources */,
 				55C007C124A57CAE00820D03 /* GridLayout.swift in Sources */,
 				55614D6F24A522170041EA26 /* SceneDelegate.swift in Sources */,

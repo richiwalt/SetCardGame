@@ -111,8 +111,8 @@ struct SetGame {
         // build array of selected cards
         let selectedCards = dealtCards.filter { $0.isSelected }
         
-        for (i, card) in selectedCards.enumerated() {
-            gameComments += "Card(\(i+1)): \(card.cardNumber.capitalized)-\(card.cardColor.capitalized)-\(card.cardShape.capitalized)-\(card.cardShading.capitalized) \n"
+        for (_, card) in selectedCards.enumerated() {
+            gameComments += " \(card.cardNumber.capitalized)-\(card.cardColor.capitalized)-\(card.cardShape.capitalized)-\(card.cardShading.capitalized) \n"
         }
         
         // if three are selected ...
@@ -169,28 +169,28 @@ struct SetGame {
         var shadingSettable = true
         for number in SetNumber.allCases {
             if ( cards.filter { $0.cardNumber == number.rawValue }.isNotASet) {
-                gameComments += "two \(number.rawValue.uppercased())'s; "
+                gameComments += "two \(number.rawValue.uppercased())s;\n"
                 numberSettable = false
                 break
             }
         }
         for color in SetColor.allCases {
             if ( cards.filter { $0.cardColor == color.rawValue }.isNotASet)  {
-                gameComments += "two \(color.rawValue.uppercased())'s; "
+                gameComments += "two \(color.rawValue.uppercased())s;\n"
                 colorSettable = false
                 break
             }
         }
         for shape in SetShape.allCases {
             if ( cards.filter { $0.cardShape == shape.rawValue }.isNotASet)  {
-                gameComments += "two \(shape.rawValue.uppercased())'s; "
+                gameComments += "two \(shape.rawValue.uppercased())s;\n"
                 shapeSettable = false
                 break
             }
         }
         for shading in SetShading.allCases {
             if ( cards.filter { $0.cardShading == shading.rawValue }.isNotASet)  {
-                gameComments += "two: \(shading.rawValue.uppercased())'s; "
+                gameComments += "two: \(shading.rawValue.uppercased())s;\n"
                 shadingSettable = false
                 break
             }
@@ -198,7 +198,7 @@ struct SetGame {
         
         if !(numberSettable && colorSettable && shapeSettable && shadingSettable) {
             SetGame.tryAgain = true
-            gameComments = "Not a Match:\n  \(gameComments)\n"
+            gameComments = "Not a Match:\n\(gameComments)\n"
         }
         
         return numberSettable && colorSettable && shapeSettable && shadingSettable
