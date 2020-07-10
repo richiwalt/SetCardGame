@@ -14,7 +14,7 @@ enum ViewCardShape {
 
 enum ViewCardShading: Double {
     case solid  = 1.0
-    case stripped = 0.40
+    case striped = 0.40
     case open = 0.01
 }
 
@@ -25,6 +25,8 @@ struct CardForView: Identifiable {
     var color: Color
     var shading: Double
     var isSelected: Bool
+    var isOneOfThreeSelected: Bool
+    var isMatched: Bool
     var id: Int
 }
 
@@ -32,39 +34,43 @@ class SetGameViewModel: ObservableObject {
     
     @Published private var game = SetGame()
     
-    
     // MARK: - present view cards based on model cards
     var cards: [CardForView] {
-        get { updateCardsForView() }
+        updateCardsForView()
     }
     
     func updateCardsForView() -> [CardForView] {
         var freshCardsForView = [CardForView]()
+        var time = 0.0
         for card in game.dealtCards {
-            
+            time += 0.25
+            if time > 3.0 { time = 0.0 }
             let card = CardForView(delay: Double(card.id),
                                    pips: card.cardNumber == "one" ? 1 : card.cardNumber == "two" ? 2 : 3,
                                    
                                    shape: card.cardShape == "squiggle" ? ViewCardShape.squiggle
-                                        : card.cardShape == "diamond" ? ViewCardShape.diamond
-                                        : ViewCardShape.circle,
+                                    : card.cardShape == "diamond" ? ViewCardShape.diamond
+                                    : ViewCardShape.circle,
                                    
                                    color: card.cardColor == "red" ? .red
-                                        : card.cardColor == "green" ? .green
-                                        : .purple,
+                                    : card.cardColor == "green" ? .green
+                                    : .purple,
                                    
                                    shading: card.cardShading == "solid" ? ViewCardShading.solid.rawValue
-                                          : card.cardShading == "open"  ? ViewCardShading.open.rawValue
-                                          : ViewCardShading.stripped.rawValue,
+                                    : card.cardShading == "open"  ? ViewCardShading.open.rawValue
+                                    : ViewCardShading.striped.rawValue,
                                    
                                    isSelected: card.isSelected,
-                                   
+                                   isOneOfThreeSelected: card.isOneOfThreeSelected,
+                                   isMatched: card.isMatched,
                                    id: card.id )
             
             freshCardsForView.append(card)
         }
         return freshCardsForView
     }
+    
+ 
     
     // MARK: User Access
     var score: Int {

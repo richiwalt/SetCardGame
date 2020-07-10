@@ -57,9 +57,7 @@ struct SetCardGameView: View {
                 
                 VStack {
                     
-                    Spacer()
-                    
-                    //SetCard(pips: 2, shape: .squiggle, color: .purple, shading: SetShading.striped.rawValue)
+                    // Spacer()
                     
                     Grid(self.viewModel.cards) { card in
                         
@@ -93,7 +91,9 @@ struct SetCardGameView: View {
                             
                             // Deal Three Cards
                             Button(action: {
+                                withAnimation {
                                     self.viewModel.callModelDealThreeMoreCards()
+                                }
                                 
                             }) { Text("Deal 3")}
                             .foregroundColor(.primary)
