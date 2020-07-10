@@ -18,6 +18,10 @@ enum ViewCardShading: Double {
     case open = 0.01
 }
 
+enum ViewCardGameState: String {
+    case undealt, inPlay, matchedAndDiscarded
+}
+
 struct CardForView: Identifiable {
     var delay: Double
     var pips: Int
@@ -27,6 +31,7 @@ struct CardForView: Identifiable {
     var isSelected: Bool
     var isOneOfThreeSelected: Bool
     var isMatched: Bool
+    var gameState: ViewCardGameState
     var id: Int
 }
 
@@ -63,6 +68,11 @@ class SetGameViewModel: ObservableObject {
                                    isSelected: card.isSelected,
                                    isOneOfThreeSelected: card.isOneOfThreeSelected,
                                    isMatched: card.isMatched,
+                                   
+                                   gameState: card.cardState == "inPlay" ? .inPlay
+                                            : card.cardState == "discarded" ? .matchedAndDiscarded
+                                            : .undealt,
+                                   
                                    id: card.id )
             
             freshCardsForView.append(card)

@@ -14,25 +14,13 @@ struct Cardify: AnimatableModifier {
     var dealFrom: CGSize = CGSize(width: Double.random(in: -1000...(-100)), height: Double.random(in: -800...(-100)) )
     @State private var isVisible: Bool = false
     // @State private var shuffleDelay: Double = 0.0
-
-    /*
-    var animatableData: AnimatablePair<CGFloat,CGFloat> {
-        get {
-            AnimatablePair(dealFrom.width, dealFrom.height)
-        }
-        set {
-            dealFrom.width = CGFloat(newValue.first)
-            dealFrom.height = CGFloat(newValue.second)
-        }
-    }
-    */
     
     func body(content: Content)  -> some View {
         ZStack {
             
                         
             // if isVisible && !card.isMatched {
-            if isVisible {
+            if isVisible && card.gameState.rawValue == "inPlay" {
                 
                 Group {
                     RoundedRectangle(cornerRadius: 10).fill(Color.white).opacity(card.isSelected ? 1.0 : 1.0 )
@@ -77,12 +65,12 @@ struct Cardify: AnimatableModifier {
         .padding(5) // for Grid within GameBoard
         .aspectRatio(2.5/3, contentMode: .fit)
         .onAppear() {
-            withAnimation(.easeInOut(duration: 2)) {
+            withAnimation(.easeInOut(duration: 1)) {
                 self.isVisible = true
             }
         }
         .onDisappear() {
-            withAnimation(.easeInOut(duration: 2)) {
+            withAnimation(.easeInOut(duration: 1)) {
                 self.isVisible = true
             }
         }

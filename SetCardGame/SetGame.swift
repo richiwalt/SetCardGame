@@ -13,19 +13,17 @@ import Foundation
 struct SetGame {
     
     var gameComments = ""
-    var score: Int = 0
+    var score = 0
     
     var deck: [SetCard]
     var dealtCards = [SetCard]()
     var disgardedCards = [SetCard]()
     
-    // var tryAgain: Bool = false
-    
     var selectedCards: [SetCard] {
         dealtCards.filter { $0.isSelected }
     }
     
-    var threeCardsSelected: Bool {
+    var threeCardsAreSelected: Bool {
         selectedCards.count == 3
     }
     
@@ -42,8 +40,9 @@ struct SetGame {
         case solid, stripe, open
     }
     enum CardGameState: String {
-        case undealt, inPlay, matchedAndDiscarded
+        case undealt, inPlay, disgarded
     }
+    
     
     init() {
         
@@ -58,6 +57,7 @@ struct SetGame {
             dealtCards[index].cardState = CardGameState.inPlay.rawValue
         }
     }
+    
     
     static func freshDeckOfCards() -> [SetCard] {
         var deck = [SetCard]()
@@ -123,7 +123,7 @@ struct SetGame {
         gameComments = ""
         
         // Process three cards already selected from last time ...
-        if threeCardsSelected {
+        if threeCardsAreSelected {
             
             // for match
             if checkForMatch(with: selectedCards) {
@@ -148,7 +148,7 @@ struct SetGame {
         }
         
         // if three are NOW selected with this card ...
-        if threeCardsSelected {
+        if threeCardsAreSelected {
             
             // first update Card's isOneOfThreeSelected attribute ..
             for card in selectedCards {
@@ -189,14 +189,15 @@ struct SetGame {
     mutating func dealThreeMoreCards() {
         
         // if match is showing when this function is called ... 
-        if threeCardsSelected, checkForMatch(with: selectedCards) {
+        if threeCardsAreSelected, checkForMatch(with: selectedCards) {
             
             // and three cards are available from the main deck
             if deck.count >= 3 {
-                for card in selectedCards {
-                    if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
-                        dealtCards[firstIndex] = deck.removeFirst()
-                        dealtCards[firstIndex].cardState = CardGameState.inPlay.rawValue
+                for selectedCard in selectedCards {
+                    if let selectedIndex = dealtCards.firstIndex(where: { $0.id == selectedCard.id  }) {
+                        dealtCards[selectedIndex].cardState = CardGameState.disgarded.rawValue
+                        dealtCards[selectedIndex] = deck.removeFirst()
+                        dealtCards[selectedIndex].cardState = CardGameState.inPlay.rawValue
                     }
                 }
                 
@@ -213,9 +214,9 @@ struct SetGame {
         } else if deck.count >= 3 {
             // no match was showing when this funtion was called ...
             // just add three more cards to dealt cards on table
-            for index in 0..<3 {
+            for _ in 0..<3 {
+                deck[0].cardState = CardGameState.inPlay.rawValue
                 dealtCards.append( deck.removeFirst() )
-                dealtCards[index].cardState = CardGameState.inPlay.rawValue
             }
         }
         gameComments = "\(deck.count) remaining; \(dealtCards.count) in play; \(disgardedCards.count)/27 matches"
@@ -259,7 +260,7 @@ struct SetGame {
         }
         
         if !(numberSettable && colorSettable && shapeSettable && shadingSettable) {
-            gameComments = "Not a Match:\n\(gameComments)\n"
+            gameComments = "Not a Match:\n\(gameComments)"
         }
         
         return numberSettable && colorSettable && shapeSettable && shadingSettable
