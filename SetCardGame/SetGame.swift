@@ -221,7 +221,7 @@ struct SetGame {
                 dealtCards.append( deck.removeFirst() )
             }
         }
-        gameComments = "\(deck.count) remaining; \(dealtCards.count) in play; \(disgardedCards.count)/27 matches"
+        gameComments = "\(deck.count) remaining cards in deck; \(dealtCards.count) cards in play; found \(score)/27 matches"
     }
     
     
