@@ -57,8 +57,6 @@ struct SetCardGameView: View {
                 
                 VStack {
                     
-                    // Spacer()
-                    
                     Grid(self.viewModel.cards) { card in
                         
                         SetCard(card: card)
@@ -69,6 +67,8 @@ struct SetCardGameView: View {
                                 }
                             }
                     }
+                            
+                            
                         
                     .frame(width: geometry.size.width, height: geometry.size.height * 0.85 )
                     

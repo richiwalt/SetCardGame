@@ -47,36 +47,77 @@ class SetGameViewModel: ObservableObject {
     func updateCardsForView() -> [CardForView] {
         var freshCardsForView = [CardForView]()
         var time = 0.0
-        for card in game.dealtCards {
+        for gameCard in game.dealtCards {
             time += 0.25
             if time > 3.0 { time = 0.0 }
-            let card = CardForView(delay: Double(card.id),
-                                   pips: card.cardNumber == "one" ? 1 : card.cardNumber == "two" ? 2 : 3,
+            let viewCard = CardForView(delay: Double(gameCard.id),
+                                   pips: gameCard.cardNumber == "one" ? 1 : gameCard.cardNumber == "two" ? 2 : 3,
                                    
-                                   shape: card.cardShape == "squiggle" ? ViewCardShape.squiggle
-                                    : card.cardShape == "diamond" ? ViewCardShape.diamond
+                                   shape: gameCard.cardShape == "squiggle" ? ViewCardShape.squiggle
+                                    : gameCard.cardShape == "diamond" ? ViewCardShape.diamond
                                     : ViewCardShape.circle,
                                    
-                                   color: card.cardColor == "red" ? .red
-                                    : card.cardColor == "green" ? .green
+                                   color: gameCard.cardColor == "red" ? .red
+                                    : gameCard.cardColor == "green" ? .green
                                     : .purple,
                                    
-                                   shading: card.cardShading == "solid" ? ViewCardShading.solid.rawValue
-                                    : card.cardShading == "open"  ? ViewCardShading.open.rawValue
+                                   shading: gameCard.cardShading == "solid" ? ViewCardShading.solid.rawValue
+                                    : gameCard.cardShading == "open"  ? ViewCardShading.open.rawValue
                                     : ViewCardShading.striped.rawValue,
                                    
-                                   isSelected: card.isSelected,
-                                   isOneOfThreeSelected: card.isOneOfThreeSelected,
-                                   isMatched: card.isMatched,
+                                   isSelected: gameCard.isSelected,
+                                   isOneOfThreeSelected: gameCard.isOneOfThreeSelected,
+                                   isMatched: gameCard.isMatched,
                                    
-                                   gameState: card.cardState == "inPlay" ? .inPlay
-                                            : card.cardState == "discarded" ? .matchedAndDiscarded
+                                   gameState: gameCard.cardState == "inPlay" ? .inPlay
+                                            : gameCard.cardState == "discarded" ? .matchedAndDiscarded
                                             : .undealt,
                                    
-                                   id: card.id )
+                                   id: gameCard.id )
             
-            freshCardsForView.append(card)
+            freshCardsForView.append(viewCard)
         }
+        
+        /*
+        
+        // to keep the grid from changing size, we always grab three more, but hidden cards, for the stack
+        for index in 0..<2 {
+            
+            time += 0.25
+            if time > 3.0 { time = 0.0 }
+            
+            let gameCard = game.deck[index]
+            
+            let viewCard = CardForView(delay: Double(gameCard.id),
+                                   pips: gameCard.cardNumber == "one" ? 1 : gameCard.cardNumber == "two" ? 2 : 3,
+                                   
+                                   shape: gameCard.cardShape == "squiggle" ? ViewCardShape.squiggle
+                                    : gameCard.cardShape == "diamond" ? ViewCardShape.diamond
+                                    : ViewCardShape.circle,
+                                   
+                                   color: gameCard.cardColor == "red" ? .red
+                                    : gameCard.cardColor == "green" ? .green
+                                    : .purple,
+                                   
+                                   shading: gameCard.cardShading == "solid" ? ViewCardShading.solid.rawValue
+                                    : gameCard.cardShading == "open"  ? ViewCardShading.open.rawValue
+                                    : ViewCardShading.striped.rawValue,
+                                   
+                                   isSelected: gameCard.isSelected,
+                                   isOneOfThreeSelected: gameCard.isOneOfThreeSelected,
+                                   isMatched: gameCard.isMatched,
+                                   
+                                   gameState: gameCard.cardState == "inPlay" ? .inPlay
+                                            : gameCard.cardState == "discarded" ? .matchedAndDiscarded
+                                            : .undealt,
+                                   
+                                   id: gameCard.id )
+            
+            freshCardsForView.append(viewCard)
+        
+        }
+         */
+ 
         return freshCardsForView
     }
     

@@ -12,14 +12,13 @@ struct Cardify: AnimatableModifier {
     
     let card: CardForView
     var dealFrom: CGSize = CGSize(width: Double.random(in: -1000...(-100)), height: Double.random(in: -800...(-100)) )
+    var disgardTo: CGSize = CGSize(width: Double.random(in: 100...(1000)), height: Double.random(in: -800...(-100)) )
     @State private var isVisible: Bool = false
-    // @State private var shuffleDelay: Double = 0.0
     
     func body(content: Content)  -> some View {
         ZStack {
             
                         
-            // if isVisible && !card.isMatched {
             if isVisible && card.gameState.rawValue == "inPlay" {
                 
                 Group {
@@ -30,7 +29,6 @@ struct Cardify: AnimatableModifier {
                         //.shadow(color: .black, radius: 1, x: 2, y: 2)
                 }
                 .scaleEffect(self.card.isSelected ? 0.60 : 1.0 )//.animation(.easeInOut(duration: 0.65))
-                //.shadow(radius: 10)
                 .transition(.offset(self.dealFrom))// .animation(Animation.easeOut.delay(  card.delay   ))
                 
                 
@@ -48,14 +46,13 @@ struct Cardify: AnimatableModifier {
                         }
                         .rotation3DEffect(Angle.degrees(self.card.isMatched ? 360 : 0 ), axis: (0,1,0))
                         .animation(self.card.isMatched ? Animation.linear(duration: 0.6).repeatForever(autoreverses: false) : .default )
-                        // .foregroundColor(self.card.color)
-                            .foregroundColor(self.card.isOneOfThreeSelected && !self.card.isMatched ? Color.gray : self.card.color )
+                        .foregroundColor(self.card.isOneOfThreeSelected && !self.card.isMatched ? Color.gray : self.card.color )
 
                     }
                 }
                 .padding() // for shape to card edge distance
                 .scaleEffect(self.card.isSelected ? 0.60 : 1.0 )//.animation(.easeInOut(duration: 0.65))
-                    .transition(.offset(dealFrom))
+                .transition(.offset(dealFrom))
                 
                 
             }

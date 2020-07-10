@@ -56,6 +56,7 @@ struct SetGame {
             dealtCards.append( deck.removeFirst() )
             dealtCards[index].cardState = CardGameState.inPlay.rawValue
         }
+                
     }
     
     
@@ -195,7 +196,8 @@ struct SetGame {
             if deck.count >= 3 {
                 for selectedCard in selectedCards {
                     if let selectedIndex = dealtCards.firstIndex(where: { $0.id == selectedCard.id  }) {
-                        dealtCards[selectedIndex].cardState = CardGameState.disgarded.rawValue
+                        
+                        // now REPLACE this card with one from the fresh deck ... 
                         dealtCards[selectedIndex] = deck.removeFirst()
                         dealtCards[selectedIndex].cardState = CardGameState.inPlay.rawValue
                     }
