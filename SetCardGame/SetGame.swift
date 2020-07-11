@@ -15,18 +15,21 @@ struct SetGame {
     var gameComments = ""
     var score = 0
     
-    var deck: [SetCard]
-    var dealtCards = [SetCard]()
-    var disgardedCards = [SetCard]()
+    var deck: [SetCard] // undealt cards waiting for game play
+    var dealtCards = [SetCard]() // array of cards that are in play
+    var disgardedCards = [SetCard]() // matched and disgarded cards
     
+    // computed array of current user-selected cards
     var selectedCards: [SetCard] {
         dealtCards.filter { $0.isSelected }
     }
     
+    // computed characteristic of game
     var threeCardsAreSelected: Bool {
         selectedCards.count == 3
     }
     
+    // just some organizational enums ...
     enum SetNumber: String, CaseIterable {
         case one, two, three
     }
@@ -48,12 +51,13 @@ struct SetGame {
         
         gameComments = "Choose 3 Cards. All attributes must all be the same, or else all different. (I.e. a given attribute cannot exists for only two cards!)"
         
-        // load fresh deck
+        // get a fresh shuffled deck of cards, these are undealt
         deck = SetGame.freshDeckOfCards()
         
-        // deal 12 cards from deck
+        // deal 12 cards from deck into dealtCards array
         for index in 0..<12 {
             dealtCards.append( deck.removeFirst() )
+            // change cardState from .undealt to .inPlay
             dealtCards[index].cardState = CardGameState.inPlay.rawValue
         }
                 
@@ -68,42 +72,47 @@ struct SetGame {
             for (indexShape, shape) in SetShape.allCases.enumerated() {
                 for (indexColor, color) in SetColor.allCases.enumerated() {
                     for (indexNumber, number) in SetNumber.allCases.enumerated() {
+                        
+                        // don't let this formula trip you up, index just increments from 0 to 81
+                        // and will be used to set the id of the card for Identifiable ...
                         index = indexShading * 27 + indexShape * 9 + indexColor * 3 + indexNumber
                         
-                        deck.append(SetCard(cardNumber: number.rawValue,
+                        // append a SetCard into undealt card deck
+                        deck.append(
+                                    SetCard(cardNumber: number.rawValue,
                                             cardShape: shape.rawValue,
                                             cardColor: color.rawValue,
                                             cardShading: shading.rawValue,
                                             cardState: CardGameState.undealt.rawValue,
-                                            id: index))
+                                            id: index)
+                                   )
                         
                     }
                 }
             }
         }
+        // shuffle the deck ...
         deck.shuffle()
+        // and once more for good measure ...
         deck.shuffle()
+        // hand the deck of shuffled cards to the game model ...
         return deck
     }
     
-    
-    
+    // nothing complex here, just shuffle cards in play in case it helps the user.
     mutating func rearrangeDealtCards() {
         dealtCards.shuffle()
     }
     
     
     // Utility Function to Deselect all Selected Gards ...
-    // Called when SetGame.tryAgain is true
     mutating func deselectAllSelected() {
-        
         for selectedCard in selectedCards {
             if let firstIndex = dealtCards.firstIndex(where: { $0.id == selectedCard.id }) {
                 dealtCards[firstIndex].isSelected = false
                 dealtCards[firstIndex].isOneOfThreeSelected = false
             }
         }
-        
     }
     
     
@@ -232,6 +241,7 @@ struct SetGame {
         var colorSettable = true
         var shapeSettable = true
         var shadingSettable = true
+        
         for number in SetNumber.allCases {
             if ( cards.filter { $0.cardNumber == number.rawValue }.isNotASet) {
                 gameComments += "  two \(number.rawValue.uppercased())S\n"

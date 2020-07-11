@@ -57,6 +57,8 @@ struct SetCardGameView: View {
                 
                 VStack {
                     
+                    Divider() 
+                    
                     Grid(self.viewModel.cards) { card in
                         
                         SetCardView(card: card)
