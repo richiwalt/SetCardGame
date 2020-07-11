@@ -66,7 +66,7 @@ struct SetCardGameView: View {
                         
                         SetCard(card: card)
                             // .transition( AnyTransition.offset(randomLocationGenerator(onCanvas: geometry.size)) )
-                            .transition( AnyTransition.offset(self.disgardTo) )
+                            .transition( AnyTransition.offset(self.disgardTo) )//.animation(.easeInOut(duration: 0.75))
                             .onTapGesture {
                                 withAnimation {
                                     self.viewModel.touch(viewCard: card)
