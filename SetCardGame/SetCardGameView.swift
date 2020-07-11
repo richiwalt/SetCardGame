@@ -107,9 +107,9 @@ struct SetCardGameView: View {
                             
                             // Rearrange
                             Button(action: {
-                                // withAnimation(.easeIn(duration: 0.85)) {
-                                self.viewModel.rearrangeCardsForView()
-                                // }
+                                withAnimation(.easeIn(duration: 0.85)) {
+                                    self.viewModel.rearrangeCardsForView()
+                                }
                                 
                             }) { Text("Rearrange")}
                             .foregroundColor(.primary)
