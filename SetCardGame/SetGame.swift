@@ -47,7 +47,7 @@ struct SetGame {
     
     init() {
         
-        gameComments = "Choose 3 Cards. All attributes must all be the same, or else all different. (I.e. a given attribute cannot exists for only two cards!)"
+        gameComments = "Choose 3 Cards. All attributes must all be the same, or else all different."
         
         // load fresh deck
         deck = SetGame.freshDeckOfCards()
@@ -180,7 +180,7 @@ struct SetGame {
                     }
                 }
                 
-                gameComments += "Try Again ..."
+                // gameComments += "Try Again ..."
             }
         }
         
@@ -249,35 +249,35 @@ struct SetGame {
         // Same for other attributes below.
         for number in SetNumber.allCases {
             if ( cards.filter { $0.cardNumber == number.rawValue }.isNotASet) {
-                gameComments += "  two \(number.rawValue.uppercased())S\n"
+                gameComments += "  two \(number.rawValue.uppercased())S "
                 numberSettable = false
                 break
             }
         }
         for color in SetColor.allCases {
             if ( cards.filter { $0.cardColor == color.rawValue }.isNotASet)  {
-                gameComments += "  two \(color.rawValue.uppercased())S\n"
+                gameComments += "  two \(color.rawValue.uppercased())S "
                 colorSettable = false
                 break
             }
         }
         for shape in SetShape.allCases {
             if ( cards.filter { $0.cardShape == shape.rawValue }.isNotASet)  {
-                gameComments += "  two \(shape.rawValue.uppercased())S\n"
+                gameComments += "  two \(shape.rawValue.uppercased())S "
                 shapeSettable = false
                 break
             }
         }
         for shading in SetShading.allCases {
             if ( cards.filter { $0.cardShading == shading.rawValue }.isNotASet)  {
-                gameComments += "  two: \(shading.rawValue.uppercased())S\n"
+                gameComments += "  two: \(shading.rawValue.uppercased())S "
                 shadingSettable = false
                 break
             }
         }
         
         if !(numberSettable && colorSettable && shapeSettable && shadingSettable) {
-            gameComments = "Not a Match:\n\(gameComments)"
+            gameComments = "Try Again: \(gameComments)"
         }
         
         return numberSettable && colorSettable && shapeSettable && shadingSettable
