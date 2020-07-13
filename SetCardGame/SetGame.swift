@@ -47,7 +47,7 @@ struct SetGame {
     
     init() {
         
-        gameComments = "Choose 3. Each attribute must be either:  all the same, or all different."
+        gameComments = "Choose 3 cards. Each attribute may be either: all the same, or all different."
         
         // load fresh deck
         deck = SetGame.freshDeckOfCards()
