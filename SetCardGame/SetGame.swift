@@ -47,7 +47,7 @@ struct SetGame {
     
     init() {
         
-        gameComments = "Choose 3 Cards. All attributes must all be the same, or else all different."
+        gameComments = "Choose 3. Each attribute must be either:  all be the same, or else all different."
         
         // load fresh deck
         deck = SetGame.freshDeckOfCards()
@@ -222,7 +222,7 @@ struct SetGame {
                 dealtCards.append( deck.removeFirst() )
             }
         }
-        gameComments = "Undealt remaining: \(deck.count) \nCards in play: \(dealtCards.count) \nFound matches: \(score)/27 matches"
+        gameComments = "Undealt Cards: \(deck.count)  Cards in play: \(dealtCards.count)  Matches: \(score)/27"
     }
     
     

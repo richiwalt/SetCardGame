@@ -69,9 +69,8 @@ struct SetCardGameView: View {
                             
                         }) { Text("Reset")}
                         .font(.headline)
-                            .foregroundColor(.primary)
-                        Spacer()
                         
+                        Spacer()
                         
                         // Change Theme
                         Button(action: {
@@ -81,7 +80,7 @@ struct SetCardGameView: View {
                             
                         }) { Text("Theme")}
                             .font(.headline)
-                            .foregroundColor(.primary)
+
                         Spacer()
                         
                         // Deal Three Cards
@@ -92,7 +91,7 @@ struct SetCardGameView: View {
                             
                         }) { Text("Deal")}
                         .font(.headline)
-                            .foregroundColor(self.viewModel.noRemainingCards ?  .none : .primary)
+                            .foregroundColor(self.viewModel.noRemainingCards ?  .white : .white)
                             .disabled(self.viewModel.noRemainingCards)
                         Spacer()
                         
@@ -104,15 +103,15 @@ struct SetCardGameView: View {
                             
                         }) { Text("Shuffle")}
                         .font(.headline)
-                        .foregroundColor(.primary)
+                        
                         Spacer()
                         
                         // Score
                         Text("Found:\(self.viewModel.score)/27").animation(.none)
-                        // .foregroundColor(.white)
                         
                     }
-                    // .padding()
+                    .foregroundColor(.white)
+                    
                     
                     Grid(self.viewModel.cards) { card in
                         
@@ -131,20 +130,15 @@ struct SetCardGameView: View {
                     .frame(width: geometry.size.width, height: geometry.size.height * 0.85 )
                     
                     Spacer()
-                    
-                    // Bottom Menue
-                    VStack {
                         
-                        
-                        
-                        // Game Comments
-                        Text("\(self.viewModel.gameComments)").animation(.none)
-                            .font(.callout)
-                            .multilineTextAlignment(.leading)
-                            .foregroundColor(.white)
-                    }
+                    // Game Comments
+                    Text("\(self.viewModel.gameComments)").animation(.none)
+                        .font(.callout)
+                        .multilineTextAlignment(.leading)
+                        .foregroundColor(.white)
+                   
                 }
-                // .background(Color.green)
+                
             }
             .padding()
         }
