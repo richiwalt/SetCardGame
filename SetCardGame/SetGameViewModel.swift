@@ -35,97 +35,74 @@ struct CardForView: Identifiable {
     var id: Int
 }
 
+
+/// Set Game ViewModel.
+///
+/// - Publishes changes from Set game Model according to the MVVM design.
+/// - Converts Set game model cards into cards tailored for views.
+/// - Cordinates themes colors for game.
 class SetGameViewModel: ObservableObject {
     
     @Published private var game = SetGame()
     
-    // MARK: - present view cards based on model cards
+    // MARK: - user access to cards tailored for views.
+    // cards are "get-only"
     var cards: [CardForView] {
         updateCardsForView()
     }
     
-    func updateCardsForView() -> [CardForView] {
+    // MARK: - view access to theme colors
+    var theme = Theme()
+    
+    /// Updates View Cards from current state of Model Cards.
+    ///
+    /// Converts model descriptions attributes into view elements.
+    private func updateCardsForView() -> [CardForView] {
         var freshCardsForView = [CardForView]()
         var time = 0.0
         for gameCard in game.dealtCards {
             time += 0.25
             if time > 3.0 { time = 0.0 }
             let viewCard = CardForView(delay: Double(gameCard.id),
-                                   pips: gameCard.cardNumber == "one" ? 1 : gameCard.cardNumber == "two" ? 2 : 3,
-                                   
-                                   shape: gameCard.cardShape == "squiggle" ? ViewCardShape.squiggle
-                                    : gameCard.cardShape == "diamond" ? ViewCardShape.diamond
-                                    : ViewCardShape.circle,
-                                   
-                                   color: gameCard.cardColor == "red" ? .red
-                                    : gameCard.cardColor == "green" ? .green
-                                    : .purple,
-                                   
-                                   shading: gameCard.cardShading == "solid" ? ViewCardShading.solid.rawValue
-                                    : gameCard.cardShading == "open"  ? ViewCardShading.open.rawValue
-                                    : ViewCardShading.striped.rawValue,
-                                   
-                                   isSelected: gameCard.isSelected,
-                                   isOneOfThreeSelected: gameCard.isOneOfThreeSelected,
-                                   isMatched: gameCard.isMatched,
-                                   
-                                   gameState: gameCard.cardState == "inPlay" ? .inPlay
-                                            : gameCard.cardState == "discarded" ? .matchedAndDiscarded
-                                            : .undealt,
-                                   
-                                   id: gameCard.id )
+                                       pips: gameCard.cardNumber == "one" ? 1 : gameCard.cardNumber == "two" ? 2 : 3,
+                                       
+                                       shape: gameCard.cardShape == "squiggle" ? ViewCardShape.squiggle
+                                        : gameCard.cardShape == "diamond" ? ViewCardShape.diamond
+                                        : ViewCardShape.circle,
+                                       
+                                       color: gameCard.cardColor == "red" ? .red
+                                        : gameCard.cardColor == "green" ? .green
+                                        : .purple,
+                                       
+                                       shading: gameCard.cardShading == "solid" ? ViewCardShading.solid.rawValue
+                                        : gameCard.cardShading == "open"  ? ViewCardShading.open.rawValue
+                                        : ViewCardShading.striped.rawValue,
+                                       
+                                       isSelected: gameCard.isSelected,
+                                       isOneOfThreeSelected: gameCard.isOneOfThreeSelected,
+                                       isMatched: gameCard.isMatched,
+                                       
+                                       gameState: gameCard.cardState == "inPlay" ? .inPlay
+                                        : gameCard.cardState == "discarded" ? .matchedAndDiscarded
+                                        : .undealt,
+                                       
+                                       id: gameCard.id )
             
             freshCardsForView.append(viewCard)
         }
         
-        /*
-        
-        // to keep the grid from changing size, we always grab three more, but hidden cards, for the stack
-        for index in 0..<2 {
-            
-            time += 0.25
-            if time > 3.0 { time = 0.0 }
-            
-            let gameCard = game.deck[index]
-            
-            let viewCard = CardForView(delay: Double(gameCard.id),
-                                   pips: gameCard.cardNumber == "one" ? 1 : gameCard.cardNumber == "two" ? 2 : 3,
-                                   
-                                   shape: gameCard.cardShape == "squiggle" ? ViewCardShape.squiggle
-                                    : gameCard.cardShape == "diamond" ? ViewCardShape.diamond
-                                    : ViewCardShape.circle,
-                                   
-                                   color: gameCard.cardColor == "red" ? .red
-                                    : gameCard.cardColor == "green" ? .green
-                                    : .purple,
-                                   
-                                   shading: gameCard.cardShading == "solid" ? ViewCardShading.solid.rawValue
-                                    : gameCard.cardShading == "open"  ? ViewCardShading.open.rawValue
-                                    : ViewCardShading.striped.rawValue,
-                                   
-                                   isSelected: gameCard.isSelected,
-                                   isOneOfThreeSelected: gameCard.isOneOfThreeSelected,
-                                   isMatched: gameCard.isMatched,
-                                   
-                                   gameState: gameCard.cardState == "inPlay" ? .inPlay
-                                            : gameCard.cardState == "discarded" ? .matchedAndDiscarded
-                                            : .undealt,
-                                   
-                                   id: gameCard.id )
-            
-            freshCardsForView.append(viewCard)
-        
-        }
-         */
- 
         return freshCardsForView
     }
     
- 
     
-    // MARK: User Access
+    
+    // MARK: User Access to score in model
     var score: Int {
         game.score
+    }
+    
+    var noRemainingCards: Bool {
+        game.dealtCards.count == 0
     }
     
     var gameComments: String {
@@ -134,13 +111,23 @@ class SetGameViewModel: ObservableObject {
     
     // MARK: - User Intent(s)
     func createNewGame() {
+        theme.loadRandom()
         game = SetGame()
     }
     
+    // Separate from model,
+    // objectWillChange.send() updates theme change immediately
+    func changeTheme() {
+        objectWillChange.send()
+        theme.loadRandom()
+    }
+    
+    // translate touch(viewCard:) to
+    // model's select(card: ) function ...
     func touch(viewCard: CardForView) {
-        let gameCardMatches = game.dealtCards.filter  { $0.id == viewCard.id }
-        assert(gameCardMatches.count == 1, "ERROR: viewCard doesnt coorespond to gameCard")
-        game.select(card: gameCardMatches.first!)
+        let arrayOfModelCardsThatMatchTouchedViewCardID = game.dealtCards.filter  { $0.id == viewCard.id }
+        assert(arrayOfModelCardsThatMatchTouchedViewCardID.count == 1, "ERROR: viewCard doesnt coorespond to exactly one gameCard")
+        game.select(card: arrayOfModelCardsThatMatchTouchedViewCardID.first!)
     }
     
     func callModelDealThreeMoreCards() {
@@ -150,4 +137,5 @@ class SetGameViewModel: ObservableObject {
     func rearrangeCardsForView() {
         game.rearrangeDealtCards()
     }
+    
 }

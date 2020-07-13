@@ -49,90 +49,104 @@ struct SetCardGameView: View {
     @ObservedObject var viewModel: SetGameViewModel
     var disgardTo: CGSize = CGSize(width: Double.random(in: 100...(1000)), height: Double.random(in: -800...(-100)) )
     
-    
     var body: some View {
         
-        ZStack {
+        return ZStack {
             
-            (LinearGradient(gradient: Gradient(colors: [.yellow, .orange, .red, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing)).edgesIgnoringSafeArea(.all)
-
+            LinearGradient(gradient: Gradient(colors: self.viewModel.theme.colorGradient ), startPoint: .topLeading, endPoint: .bottomTrailing).edgesIgnoringSafeArea(.all)
+            
             GeometryReader { geometry in
                 
                 VStack {
                     
-                    Divider() 
+                    HStack {
+                        
+                        // New Game
+                        Button(action: {
+                            withAnimation(.easeInOut(duration: 0.75)) {
+                                self.viewModel.createNewGame()
+                            }
+                            
+                        }) { Text("Reset")}
+                        .font(.headline)
+                            .foregroundColor(.primary)
+                        Spacer()
+                        
+                        
+                        // Change Theme
+                        Button(action: {
+                            withAnimation(.easeInOut(duration: 0.75)) {
+                                self.viewModel.changeTheme()
+                            }
+                            
+                        }) { Text("Theme")}
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        Spacer()
+                        
+                        // Deal Three Cards
+                        Button(action: {
+                            withAnimation {
+                                self.viewModel.callModelDealThreeMoreCards()
+                            }
+                            
+                        }) { Text("Deal")}
+                        .font(.headline)
+                            .foregroundColor(self.viewModel.noRemainingCards ?  .none : .primary)
+                            .disabled(self.viewModel.noRemainingCards)
+                        Spacer()
+                        
+                        // Rearrange
+                        Button(action: {
+                            withAnimation(.easeIn(duration: 0.85)) {
+                                self.viewModel.rearrangeCardsForView()
+                            }
+                            
+                        }) { Text("Shuffle")}
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                        Spacer()
+                        
+                        // Score
+                        Text("Found:\(self.viewModel.score)/27").animation(.none)
+                        // .foregroundColor(.white)
+                        
+                    }
+                    // .padding()
                     
                     Grid(self.viewModel.cards) { card in
                         
                         SetCard(card: card)
-                            // .transition( AnyTransition.offset(randomLocationGenerator(onCanvas: geometry.size)) )
-                            .transition( AnyTransition.offset(self.disgardTo) )//.animation(.easeInOut(duration: 0.75))
+                            // i think .transition( works here because card is Identifiable ...
+                            .transition( .offset(self.disgardTo) ).animation(.easeInOut(duration: 0.6))
                             .onTapGesture {
                                 withAnimation {
                                     self.viewModel.touch(viewCard: card)
                                 }
-                            }
+                        }
                     }
-                            
-                            
+                        
+                        
                         
                     .frame(width: geometry.size.width, height: geometry.size.height * 0.85 )
                     
                     Spacer()
                     
                     // Bottom Menue
-                    HStack {
+                    VStack {
                         
-                        VStack {
-                            
-                            // New Game
-                            Button(action: {
-                                withAnimation(.easeInOut(duration: 0.75)) {
-                                    self.viewModel.createNewGame()
-                                }
-                                
-                            }) { Text("Reset Game")}
-                                .foregroundColor(.primary)
-                            Spacer()
-                            
-                            // Deal Three Cards
-                            Button(action: {
-                                withAnimation {
-                                    self.viewModel.callModelDealThreeMoreCards()
-                                }
-                                
-                            }) { Text("Deal 3")}
-                            .foregroundColor(.primary)
-                            Spacer()
-                            
-                            // Rearrange
-                            Button(action: {
-                                withAnimation(.easeIn(duration: 0.85)) {
-                                    self.viewModel.rearrangeCardsForView()
-                                }
-                                
-                            }) { Text("Rearrange")}
-                            .foregroundColor(.primary)
-                            Spacer()
-                            
-                            // Score
-                            Text("Matches: \(self.viewModel.score)/27").animation(.none)
-                                .foregroundColor(.white)
-                            
-                        }
-                        .padding()
-                        Spacer()
+                        
                         
                         // Game Comments
-                            Text("\(self.viewModel.gameComments)").animation(.none)
-                                .font(.callout)
-                                .multilineTextAlignment(.leading)
-                                .foregroundColor(.white)
+                        Text("\(self.viewModel.gameComments)").animation(.none)
+                            .font(.callout)
+                            .multilineTextAlignment(.leading)
+                            .foregroundColor(.white)
                     }
                 }
                 // .background(Color.green)
             }
-        .padding()
+            .padding()
         }
     }
 }

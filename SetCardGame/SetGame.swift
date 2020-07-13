@@ -9,40 +9,38 @@
 import Foundation
 
 
-
 struct SetGame {
     
-    var gameComments = ""
-    var score = 0
+    private(set) var gameComments = ""
+    private(set) var score = 0
     
-    var deck: [SetCard] // undealt cards waiting for game play
-    var dealtCards = [SetCard]() // array of cards that are in play
-    var disgardedCards = [SetCard]() // matched and disgarded cards
+    private var deck: [SetCard]
+    private(set) var dealtCards = [SetCard]()
+    private var disgardedCards = [SetCard]()
     
-    // computed array of current user-selected cards
-    var selectedCards: [SetCard] {
+    private var selectedCards: [SetCard] {
         dealtCards.filter { $0.isSelected }
     }
     
-    // computed characteristic of game
-    var threeCardsAreSelected: Bool {
+    private static var idSeedStart = 81
+    
+    private var threeCardsAreSelected: Bool {
         selectedCards.count == 3
     }
     
-    // just some organizational enums ...
-    enum SetNumber: String, CaseIterable {
+    private enum SetNumber: String, CaseIterable {
         case one, two, three
     }
-    enum SetShape: String, CaseIterable {
+    private enum SetShape: String, CaseIterable {
         case diamond, squiggle, oval
     }
-    enum SetColor: String, CaseIterable {
+    private enum SetColor: String, CaseIterable {
         case red, green, purple
     }
-    enum SetShading: String, CaseIterable {
+    private enum SetShading: String, CaseIterable {
         case solid, stripe, open
     }
-    enum CardGameState: String {
+    private enum CardGameState: String {
         case undealt, inPlay, disgarded
     }
     
@@ -51,83 +49,77 @@ struct SetGame {
         
         gameComments = "Choose 3 Cards. All attributes must all be the same, or else all different. (I.e. a given attribute cannot exists for only two cards!)"
         
-        // get a fresh shuffled deck of cards, these are undealt
+        // load fresh deck
         deck = SetGame.freshDeckOfCards()
         
-        // deal 12 cards from deck into dealtCards array
+        // deal 12 cards from deck
         for index in 0..<12 {
             dealtCards.append( deck.removeFirst() )
-            // change cardState from .undealt to .inPlay
             dealtCards[index].cardState = CardGameState.inPlay.rawValue
         }
-                
+        
     }
     
     
-    static func freshDeckOfCards() -> [SetCard] {
+    private static func freshDeckOfCards() -> [SetCard] {
         var deck = [SetCard]()
         var index: Int
+        
+        // SetGame.idSeedStart = SetGame.idSeedStart == 0 ? 81 : 0
         
         for (indexShading, shading) in SetShading.allCases.enumerated() {
             for (indexShape, shape) in SetShape.allCases.enumerated() {
                 for (indexColor, color) in SetColor.allCases.enumerated() {
                     for (indexNumber, number) in SetNumber.allCases.enumerated() {
+                        index = indexShading * 27 + indexShape * 9 + indexColor * 3 + indexNumber + SetGame.idSeedStart
                         
-                        // don't let this formula trip you up, index just increments from 0 to 81
-                        // and will be used to set the id of the card for Identifiable ...
-                        index = indexShading * 27 + indexShape * 9 + indexColor * 3 + indexNumber
-                        
-                        // append a SetCard into undealt card deck
-                        deck.append(
-                                    SetCard(cardNumber: number.rawValue,
+                        deck.append(SetCard(cardNumber: number.rawValue,
                                             cardShape: shape.rawValue,
                                             cardColor: color.rawValue,
                                             cardShading: shading.rawValue,
                                             cardState: CardGameState.undealt.rawValue,
-                                            id: index)
-                                   )
+                                            id: index))
                         
                     }
                 }
             }
         }
-        // shuffle the deck ...
         deck.shuffle()
-        // and once more for good measure ...
         deck.shuffle()
-        // hand the deck of shuffled cards to the game model ...
         return deck
-    }
-    
-    // nothing complex here, just shuffle cards in play in case it helps the user.
-    mutating func rearrangeDealtCards() {
-        dealtCards.shuffle()
     }
     
     
     // Utility Function to Deselect all Selected Gards ...
-    mutating func deselectAllSelected() {
+    // Called when SetGame.tryAgain is true
+    private mutating func deselectAllSelected() {
+        
         for selectedCard in selectedCards {
             if let firstIndex = dealtCards.firstIndex(where: { $0.id == selectedCard.id }) {
                 dealtCards[firstIndex].isSelected = false
                 dealtCards[firstIndex].isOneOfThreeSelected = false
             }
         }
+        
     }
     
     
-    mutating func toggleSelectedAttribute(for card: SetCard) {
+    private mutating func toggleSelectedAttribute(for card: SetCard) {
         if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
             dealtCards[firstIndex].isSelected = !dealtCards[ firstIndex ].isSelected
         }
     }
     
     
+    mutating func rearrangeDealtCards() {
+        dealtCards.shuffle()
+    }
     
+    /// Executes Set game logic when player selects a card.
     ///
-    /// The Heart of Game Logic
-    ///   ... perform actions when a card is selected
-    ///
+    /// - allows selection/deselection for first two cards.
+    /// - detects and processes _three-cards-are-selected_ game state.
+    /// - parameter card: A card in _dealtCards_ array.
     mutating func select(card: SetCard ) {
         
         gameComments = ""
@@ -147,7 +139,7 @@ struct SetGame {
             }
             return
         }
-                        
+        
         // toggle this card as selected/deSelected ...
         toggleSelectedAttribute(for: card)
         
@@ -187,7 +179,7 @@ struct SetGame {
                         dealtCards[firstIndex].isMatched = false
                     }
                 }
-
+                
                 gameComments += "Try Again ..."
             }
         }
@@ -198,7 +190,7 @@ struct SetGame {
     
     mutating func dealThreeMoreCards() {
         
-        // if match is showing when this function is called ... 
+        // if match is showing when this function is called ...
         if threeCardsAreSelected, checkForMatch(with: selectedCards) {
             
             // and three cards are available from the main deck
@@ -206,7 +198,7 @@ struct SetGame {
                 for selectedCard in selectedCards {
                     if let selectedIndex = dealtCards.firstIndex(where: { $0.id == selectedCard.id  }) {
                         
-                        // now REPLACE this card with one from the fresh deck ... 
+                        // now REPLACE this card with one from the fresh deck ...
                         dealtCards[selectedIndex] = deck.removeFirst()
                         dealtCards[selectedIndex].cardState = CardGameState.inPlay.rawValue
                     }
@@ -221,7 +213,7 @@ struct SetGame {
                 }
             }
             
-        
+            
         } else if deck.count >= 3 {
             // no match was showing when this funtion was called ...
             // just add three more cards to dealt cards on table
@@ -230,18 +222,31 @@ struct SetGame {
                 dealtCards.append( deck.removeFirst() )
             }
         }
-        gameComments = "\(deck.count) remaining cards in deck; \(dealtCards.count) cards in play; found \(score)/27 matches"
+        gameComments = "Undealt remaining: \(deck.count) \nCards in play: \(dealtCards.count) \nFound matches: \(score)/27 matches"
     }
     
     
-    
-    mutating func checkForMatch(with cards: [SetCard] ) -> Bool {
+    /// Check selected cards for a _"Set-match"_.
+    ///
+    /// Methodology: Assume a valid set and fail if
+    /// two, and only two, of a given attribute is detected.
+    /// - parameter cards: An array of 3 user-selected cards.
+    private mutating func checkForMatch(with cards: [SetCard] ) -> Bool {
+        
+        assert( cards.count == 3, "This is not a proper number of cards to check Set match!")
+        
         gameComments = ""
         var numberSettable = true
         var colorSettable = true
         var shapeSettable = true
         var shadingSettable = true
         
+        // For each SetNumber variation, check for "two, and only two"
+        // cards with that variation.
+        // If failure detected, set match as false, and break out of
+        // additional checks for this attribute and update gameComments.
+        //
+        // Same for other attributes below.
         for number in SetNumber.allCases {
             if ( cards.filter { $0.cardNumber == number.rawValue }.isNotASet) {
                 gameComments += "  two \(number.rawValue.uppercased())S\n"
