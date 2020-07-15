@@ -55,11 +55,16 @@ struct SetCardGameView: View {
             
             LinearGradient(gradient: Gradient(colors: self.viewModel.theme.colorGradient ), startPoint: .topLeading, endPoint: .bottomTrailing).edgesIgnoringSafeArea(.all)
             
+            
             GeometryReader { geometry in
                 
                 VStack {
                     
                     HStack {
+                        
+                        // Spacer()
+                        
+                        Text(" ") // used as a small spacer
                         
                         // New Game
                         Button(action: {
@@ -67,9 +72,8 @@ struct SetCardGameView: View {
                                 self.viewModel.createNewGame()
                             }
                             
-                        }) { Text("Reset")}
-                        .font(.headline)
-                        
+                        }) { Image(systemName: "arrow.counterclockwise") }
+                        .font(.system(size: 22.0))
                         Spacer()
                         
                         // Change Theme
@@ -78,8 +82,9 @@ struct SetCardGameView: View {
                                 self.viewModel.changeTheme()
                             }
                             
-                        }) { Text("Theme")}
-                            .font(.headline)
+                        }) { Image(systemName: "paintbrush") }
+                        .font(.system(size: 22.0))
+                            //.font(.headline)
 
                         Spacer()
                         
@@ -89,10 +94,11 @@ struct SetCardGameView: View {
                                 self.viewModel.callModelDealThreeMoreCards()
                             }
                             
-                        }) { Text("Deal")}
-                        .font(.headline)
+                        }) { Image(systemName: "rectangle.stack.badge.plus") }
+                        .font(.system(size: 22.0))
                             .foregroundColor(self.viewModel.noRemainingCards ?  .white : .white)
                             .disabled(self.viewModel.noRemainingCards)
+                        
                         Spacer()
                         
                         // Rearrange
@@ -101,13 +107,15 @@ struct SetCardGameView: View {
                                 self.viewModel.rearrangeCardsForView()
                             }
                             
-                        }) { Text("Shuffle")}
-                        .font(.headline)
+                        }) { Image(systemName: "shuffle") }
+                        .font(.system(size: 22.0))
                         
                         Spacer()
                         
                         // Score
-                        Text("Sets:\(self.viewModel.score)/27").animation(.none)
+                        Text("Sets: \(self.viewModel.score)/27").animation(.none)
+                        
+                        
                         
                     }
                     .foregroundColor(.white)

@@ -47,7 +47,7 @@ struct SetGameModel {
     
     init() {
         
-        gameComments = "Choose 3 cards. Each attribute may be either: all the same, or all different."
+        gameComments = "Pick 3 with each quality all the same or all different. (2 only cannot share a quality.)"
         
         // load fresh deck
         deck = SetGameModel.freshDeckOfCards()
@@ -222,7 +222,7 @@ struct SetGameModel {
                 dealtCards.append( deck.removeFirst() )
             }
         }
-        gameComments = "Undealt Cards: \(deck.count)  Cards in play: \(dealtCards.count)  Sets: \(score)/27"
+        gameComments = "Undealt: \(deck.count)  In Play: \(dealtCards.count)  Sets: \(score)/27"
     }
     
     
