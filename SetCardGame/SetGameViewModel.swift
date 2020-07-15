@@ -43,7 +43,7 @@ struct CardForView: Identifiable {
 /// - Cordinates themes colors for game.
 class SetGameViewModel: ObservableObject {
     
-    @Published private var game = SetGame()
+    @Published private var game = SetGameModel()
     
     // MARK: - user access to cards tailored for views.
     // cards are "get-only"
@@ -112,7 +112,7 @@ class SetGameViewModel: ObservableObject {
     // MARK: - User Intent(s)
     func createNewGame() {
         theme.loadRandom()
-        game = SetGame()
+        game = SetGameModel()
     }
     
     // Separate from model,

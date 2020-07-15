@@ -107,7 +107,7 @@ struct SetCardGameView: View {
                         Spacer()
                         
                         // Score
-                        Text("Found:\(self.viewModel.score)/27").animation(.none)
+                        Text("Sets:\(self.viewModel.score)/27").animation(.none)
                         
                     }
                     .foregroundColor(.white)

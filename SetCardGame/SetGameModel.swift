@@ -9,7 +9,7 @@
 import Foundation
 
 
-struct SetGame {
+struct SetGameModel {
     
     private(set) var gameComments = ""
     private(set) var score = 0
@@ -50,7 +50,7 @@ struct SetGame {
         gameComments = "Choose 3 cards. Each attribute may be either: all the same, or all different."
         
         // load fresh deck
-        deck = SetGame.freshDeckOfCards()
+        deck = SetGameModel.freshDeckOfCards()
         
         // deal 12 cards from deck
         for index in 0..<12 {
@@ -71,7 +71,7 @@ struct SetGame {
             for (indexShape, shape) in SetShape.allCases.enumerated() {
                 for (indexColor, color) in SetColor.allCases.enumerated() {
                     for (indexNumber, number) in SetNumber.allCases.enumerated() {
-                        index = indexShading * 27 + indexShape * 9 + indexColor * 3 + indexNumber + SetGame.idSeedStart
+                        index = indexShading * 27 + indexShape * 9 + indexColor * 3 + indexNumber + SetGameModel.idSeedStart
                         
                         deck.append(SetCard(cardNumber: number.rawValue,
                                             cardShape: shape.rawValue,
@@ -222,7 +222,7 @@ struct SetGame {
                 dealtCards.append( deck.removeFirst() )
             }
         }
-        gameComments = "Undealt Cards: \(deck.count)  Cards in play: \(dealtCards.count)  Matches: \(score)/27"
+        gameComments = "Undealt Cards: \(deck.count)  Cards in play: \(dealtCards.count)  Sets: \(score)/27"
     }
     
     
