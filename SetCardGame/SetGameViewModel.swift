@@ -111,7 +111,7 @@ class SetGameViewModel: ObservableObject {
     
     // MARK: - User Intent(s)
     func createNewGame() {
-        theme.loadRandom()
+        theme.loadNext()
         game = SetGameModel()
     }
     
@@ -119,7 +119,7 @@ class SetGameViewModel: ObservableObject {
     // objectWillChange.send() updates theme change immediately
     func changeTheme() {
         objectWillChange.send()
-        theme.loadRandom()
+        theme.loadNext()
     }
     
     // translate touch(viewCard:) to
