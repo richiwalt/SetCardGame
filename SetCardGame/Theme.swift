@@ -19,7 +19,7 @@ struct Theme {
     
     var nextColorIndex: Int = 0
     
-    // theme ColorGradients for background 
+    // theme ColorGradients for background
         let colorGradients: [ [Color] ] = [
         [ Color( #colorLiteral(red: 0.2196078431372549, green: 0.00784313725490196, blue: 0.8549019607843137, alpha: 1.0) ), Color( #colorLiteral(red: 0.17647058823529413, green: 0.4980392156862745, blue: 0.7568627450980392, alpha: 1.0) ), Color( #colorLiteral(red: 0.23921568627450981, green: 0.6745098039215687, blue: 0.9686274509803922, alpha: 1.0) ), Color( #colorLiteral(red: 0.4745098039215686, green: 0.8392156862745098, blue: 0.9764705882352941, alpha: 1.0) )],
         [ Color( #colorLiteral(red: 0.11764705882352941, green: 0.0, blue: 0.06666666666666667, alpha: 1.0) ), Color( #colorLiteral(red: 0.30980392156862746, green: 0.20392156862745098, blue: 0.0392156862745098, alpha: 1.0) ), Color( #colorLiteral(red: 0.5058823529411764, green: 0.33725490196078434, blue: 0.06666666666666667, alpha: 1.0) ), Color( #colorLiteral(red: 0.7254901960784313, green: 0.47843137254901963, blue: 0.09803921568627451, alpha: 1.0) )] ,

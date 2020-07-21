@@ -112,8 +112,24 @@ struct SetCardGameView: View {
                         
                         Spacer()
                         
+                        // Rearrange
+                        Button(action: {
+                            withAnimation(.easeIn(duration: 0.85)) {
+                                self.viewModel.findMatches()
+                            }
+                            
+                        }) { Image(systemName: "eyeglasses") }
+                        .font(.system(size: 22.0))
+
+                        
+
+                        
+                        
+                
+                        
+                        
                         // Score
-                        Text("Sets: \(self.viewModel.score)/27").animation(.none)
+                        // Text("Sets: \(self.viewModel.score)/27").animation(.none)
                         
                         
                         

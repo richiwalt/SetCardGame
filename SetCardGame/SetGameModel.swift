@@ -9,6 +9,41 @@
 import Foundation
 
 
+/// Combinations for N Chose k.
+///
+///
+func combinations<T>(itemsN: [T], chooseK : Int) -> [[T]] {
+    if(itemsN.count == chooseK) {
+        return [itemsN]
+    }
+    
+    if(itemsN.isEmpty) {
+        return []
+    }
+    
+    if(chooseK == 0) {
+        return []
+    }
+    
+    if(chooseK == 1) {
+        return itemsN.map { [$0] }
+    }
+    
+    var result : [[T]] = []
+    
+    let rest = Array(itemsN.suffix(from: 1))
+    let subCombos = combinations(itemsN: rest, chooseK: chooseK - 1)
+    result += subCombos.map { [itemsN[0]] + $0 }
+    result += combinations(itemsN: rest, chooseK: chooseK)
+    return result
+}
+
+
+
+
+
+
+
 struct SetGameModel {
     
     private(set) var gameComments = ""
@@ -16,7 +51,10 @@ struct SetGameModel {
     
     private var deck: [SetCard]
     private(set) var dealtCards = [SetCard]()
+    private var setMatches = Set<Set<Int>>()   // indices of Set matches; :set elliminates duplicates
     private var disgardedCards = [SetCard]()
+    
+    private var cheatMatch = [SetCard]()
     
     private var selectedCards: [SetCard] {
         dealtCards.filter { $0.isSelected }
@@ -28,16 +66,16 @@ struct SetGameModel {
         selectedCards.count == 3
     }
     
-    private enum SetNumber: String, CaseIterable {
+    fileprivate enum SetNumber: String, CaseIterable {
         case one, two, three
     }
-    private enum SetShape: String, CaseIterable {
+    fileprivate enum SetShape: String, CaseIterable {
         case diamond, squiggle, oval
     }
-    private enum SetColor: String, CaseIterable {
+    fileprivate enum SetColor: String, CaseIterable {
         case red, green, purple
     }
-    private enum SetShading: String, CaseIterable {
+    fileprivate enum SetShading: String, CaseIterable {
         case solid, stripe, open
     }
     private enum CardGameState: String {
@@ -130,11 +168,13 @@ struct SetGameModel {
             // for match
             if checkForMatch(with: selectedCards) {
                 dealThreeMoreCards()
+                cheatMatch.removeAll()
                 toggleSelectedAttribute(for: card)
                 
             } else {  // process a non-match
                 gameComments = ""
                 deselectAllSelected()
+                cheatMatch.removeAll()
                 toggleSelectedAttribute(for: card)
             }
             return
@@ -161,7 +201,8 @@ struct SetGameModel {
             
             // process for match
             if checkForMatch(with: selectedCards ) == true {
-                gameComments = "😃😃😃😃😃😃😃😃"
+                cheatMatch.removeAll()
+                gameComments = "😃😃😃😃😃😃😃😃\n Tap any card to continue."
                 score += 1
                 
                 // first mark these three cards as a matched ...
@@ -189,6 +230,8 @@ struct SetGameModel {
     
     
     mutating func dealThreeMoreCards() {
+        
+        findCardSetsInDealtCards()
         
         // if match is showing when this function is called ...
         if threeCardsAreSelected, checkForMatch(with: selectedCards) {
@@ -283,7 +326,82 @@ struct SetGameModel {
         return numberSettable && colorSettable && shapeSettable && shadingSettable
     }
     
-    struct SetCard: Identifiable {
+    
+    /// Index of Card that completes a Set Match.
+    ///
+    ///  Helpter function to find the third matching card index of a card pair comnination.
+    /// - Parameter firstTwoCards: an array that holds two Set cards.
+    func matchingCardIndex(for firstTwoCards: [SetCard], in cardDeck: [SetCard]) -> Int? {
+        guard let first = cardDeck.firstIndex(where: {
+            $0.cardNumber == firstTwoCards.missingSetNumber() &&
+            $0.cardShape == firstTwoCards.missingSetShape() &&
+            $0.cardColor == firstTwoCards.missingSetColor() &&
+            $0.cardShading == firstTwoCards.missingSetFill()    })  else { return nil }
+        return first
+    }
+    
+    
+    /// Searches DealtCards for Cheat Match.
+    ///
+    ///
+    mutating func findCardSetsInDealtCards() {
+        
+        if threeCardsAreSelected {
+            gameComments = "Tap any Card to Continue ..."
+            return 
+        }
+        
+        // check if existing cheatMatch is currently good.
+        if cheatMatch.count == 3 && checkForMatch(with: cheatMatch ) {
+            
+            for card in cheatMatch {
+                let index = dealtCards.firstIndex( where: { $0.cardNumber == card.cardNumber && $0.cardColor == card.cardColor && $0.cardShape == card.cardShape && $0.cardShading == card.cardShading } )
+                
+                if dealtCards[index!].isSelected == false {
+                    select(card: card )
+                    return
+                }
+            }
+            
+        } else { // load a new cheat.
+                    
+            let twoCardCombinations = combinations(itemsN: dealtCards, chooseK: 2)
+            var tempMatch = Set<Int>()
+            setMatches.removeAll()
+            cheatMatch.removeAll()
+            
+            for cardPair in twoCardCombinations {
+                if let lastMatchingCardIndex = matchingCardIndex(for: cardPair, in: dealtCards) {
+                    
+                    let first = dealtCards.firstIndex( where: { $0.cardNumber == cardPair[0].cardNumber && $0.cardColor == cardPair[0].cardColor && $0.cardShape == cardPair[0].cardShape && $0.cardShading == cardPair[0].cardShading } )
+                    
+                    let second = dealtCards.firstIndex( where: { $0.cardNumber == cardPair[1].cardNumber && $0.cardColor == cardPair[1].cardColor && $0.cardShape == cardPair[1].cardShape && $0.cardShading == cardPair[1].cardShading } )
+
+                    let third = lastMatchingCardIndex
+                    
+                    tempMatch = [ first!, second!, third ]
+                    setMatches.insert( tempMatch )
+                }
+            }
+            
+            if let setMatch = setMatches.randomElement() {
+                for index in setMatch {
+                    cheatMatch.append(dealtCards[index])
+                }
+            }
+        }
+                
+        switch setMatches.count {
+        case 0: gameComments = "There are no sets in the dealt cards above; deal three more cards."
+        case 1: gameComments = "There is only \(setMatches.count) set in the dealt cards above."
+        default: gameComments = "There are \(setMatches.count) sets in the dealt cards above."
+        }
+        
+
+    }
+    
+    
+    struct SetCard: Identifiable  {
         
         // Pure Game Attributes
         let cardNumber: String
@@ -307,5 +425,57 @@ struct SetGameModel {
 extension Array {
     var isNotASet: Bool {
         self.count == 2 ? true : false
+    }
+}
+
+
+extension Array where Element == SetGameModel.SetCard {
+    
+    func missingSetShape() -> String? {
+        var shapeCount: Int
+        var possibleShape: String?
+        assert(self.count == 2, "Expected Array size of 2, received array of size \(self.count) ")
+        for shape in SetGameModel.SetShape.allCases {
+            shapeCount = self.filter { $0.cardShape == shape.rawValue }.count
+            if shapeCount == self.count { return shape.rawValue }
+            if shapeCount == 0 { possibleShape = shape.rawValue}
+        }
+        return possibleShape
+    }
+    
+    func missingSetNumber() -> String? {
+        var numberCount: Int
+        var possibleNumber: String?
+        assert(self.count == 2, "Expected Array size of 2, received array of size \(self.count) ")
+        for number in SetGameModel.SetNumber.allCases {
+            numberCount = self.filter { $0.cardNumber == number.rawValue }.count
+            if numberCount == self.count { return number.rawValue }
+            if numberCount == 0 { possibleNumber = number.rawValue}
+        }
+        return possibleNumber
+    }
+    
+    func missingSetColor() -> String? {
+        var colorCount: Int
+        var possibleColor: String?
+        assert(self.count == 2, "Expected Array size of 2, received array of size \(self.count) ")
+        for color in SetGameModel.SetColor.allCases {
+            colorCount = self.filter { $0.cardColor == color.rawValue }.count
+            if colorCount == self.count { return color.rawValue }
+            if colorCount == 0 { possibleColor = color.rawValue}
+        }
+        return possibleColor
+    }
+    
+    func missingSetFill() -> String? {
+        var shadingCount: Int
+        var possibleShading: String?
+        assert(self.count == 2, "Expected Array size of 2, received array of size \(self.count) ")
+        for shading in SetGameModel.SetShading.allCases {
+            shadingCount = self.filter { $0.cardShading == shading.rawValue }.count
+            if shadingCount == self.count { return shading.rawValue }
+            if shadingCount == 0 { possibleShading = shading.rawValue}
+        }
+        return possibleShading
     }
 }
