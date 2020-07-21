@@ -62,7 +62,7 @@ struct SetCardGameView: View {
                     
                     HStack {
                         
-                        // Spacer()
+                        
                         
                         Text(" ") // used as a small spacer
                         
@@ -101,6 +101,7 @@ struct SetCardGameView: View {
                         
                         Spacer()
                         
+                        
                         // Rearrange
                         Button(action: {
                             withAnimation(.easeIn(duration: 0.85)) {
@@ -120,18 +121,11 @@ struct SetCardGameView: View {
                             
                         }) { Image(systemName: "eyeglasses") }
                         .font(.system(size: 22.0))
-
-                        
-
-                        
-                        
-                
                         
                         
                         // Score
                         // Text("Sets: \(self.viewModel.score)/27").animation(.none)
-                        
-                        
+                  
                         
                     }
                     .foregroundColor(.white)
@@ -158,7 +152,7 @@ struct SetCardGameView: View {
                     // Game Comments
                     Text("\(self.viewModel.gameComments)").animation(.none)
                         .font(.callout)
-                        .multilineTextAlignment(.leading)
+                        .multilineTextAlignment(.center)
                         .foregroundColor(.white)
                    
                 }

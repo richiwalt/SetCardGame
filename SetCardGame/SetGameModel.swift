@@ -150,6 +150,7 @@ struct SetGameModel {
     
     
     mutating func rearrangeDealtCards() {
+        gameComments = "Shuffling ..."
         dealtCards.shuffle()
     }
     
@@ -202,7 +203,7 @@ struct SetGameModel {
             // process for match
             if checkForMatch(with: selectedCards ) == true {
                 cheatMatch.removeAll()
-                gameComments = "😃😃😃😃😃😃😃😃\n Tap any card to continue."
+                gameComments = "😃😃😃😃😃😃😃😃"
                 score += 1
                 
                 // first mark these three cards as a matched ...
@@ -265,7 +266,7 @@ struct SetGameModel {
                 dealtCards.append( deck.removeFirst() )
             }
         }
-        gameComments = "Undealt: \(deck.count)  In Play: \(dealtCards.count)  Sets: \(score)/27"
+        gameComments = "Adding 3 More Cards. (Undealt: \(deck.count)  In Play: \(dealtCards.count)  Sets: \(score)/27)"
     }
     
     
@@ -348,7 +349,7 @@ struct SetGameModel {
         
         if threeCardsAreSelected {
             gameComments = "Tap any Card to Continue ..."
-            return 
+            return
         }
         
         // check if existing cheatMatch is currently good.
@@ -396,6 +397,8 @@ struct SetGameModel {
         case 1: gameComments = "There is only \(setMatches.count) set in the dealt cards above."
         default: gameComments = "There are \(setMatches.count) sets in the dealt cards above."
         }
+        
+        gameComments += " Tap eyeglasses for even more help."
         
 
     }
