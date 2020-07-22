@@ -39,11 +39,6 @@ func combinations<T>(itemsN: [T], chooseK : Int) -> [[T]] {
 }
 
 
-
-
-
-
-
 struct SetGameModel {
     
     private(set) var gameComments = ""
@@ -155,7 +150,6 @@ struct SetGameModel {
     ///
     /// Perhaps seeing cards in different arrangement will enable seeing set possibilities  better.
     mutating func rearrangeDealtCards() {
-        gameComments = "Shuffling ..."
         dealtCards.shuffle()
     }
     
@@ -174,7 +168,7 @@ struct SetGameModel {
             // process a match
             if checkForMatch(with: selectedCards) {
                 dealThreeMoreCards()
-                cheatMatch.removeAll() // whether user-found match, or cheat-found match, clear cheatMatch as new dealtCards state will follow.
+                // cheatMatch.removeAll() // whether user-found match, or cheat-found match, clear cheatMatch as new dealtCards state will follow.
                 toggleSelectedAttribute(for: card)
                 
             } else {  // process a non-match
@@ -240,6 +234,7 @@ struct SetGameModel {
         // if three more cards ...
         // setMatches info is old, update this
         if deck.count >= 3 {
+            cheatMatch.removeAll()
             setMatches.removeAll()
         }
         
