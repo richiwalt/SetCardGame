@@ -9,13 +9,13 @@
 import SwiftUI
 
 enum ViewCardShape {
-    case circle, diamond, squiggle
+    case diamond, squiggle, circle
 }
 
 enum ViewCardShading: Double {
-    case solid  = 1.0
-    case striped = 0.40
-    case open = 0.01
+    case filled  = 1.0
+    case patterened = 0.40
+    case outlined = 0.01
 }
 
 enum ViewCardGameState: String {
@@ -64,26 +64,28 @@ class SetGameViewModel: ObservableObject {
             time += 0.25
             if time > 3.0 { time = 0.0 }
             let viewCard = CardForView(delay: Double(gameCard.id),
-                                       pips: gameCard.cardNumber == "one" ? 1 : gameCard.cardNumber == "two" ? 2 : 3,
+                                       pips: (gameCard.cardNumber == SetGameModel.SetNumber.one.rawValue) ? 1
+                                        : (gameCard.cardNumber == SetGameModel.SetNumber.two.rawValue) ? 2 : 3,
                                        
-                                       shape: gameCard.cardShape == "squiggle" ? ViewCardShape.squiggle
-                                        : gameCard.cardShape == "diamond" ? ViewCardShape.diamond
+                                       shape: (gameCard.cardShape == SetGameModel.SetShape.firstShape.rawValue) ? ViewCardShape.diamond
+                                        : (gameCard.cardShape == SetGameModel.SetShape.secondShape.rawValue) ? ViewCardShape.squiggle
                                         : ViewCardShape.circle,
                                        
-                                       color: gameCard.cardColor == "red" ? .red
-                                        : gameCard.cardColor == "green" ? .green
+                                       color: (gameCard.cardColor == SetGameModel.SetColor.firstColor.rawValue) ? .red
+                                        : (gameCard.cardColor == SetGameModel.SetColor.secondColor.rawValue) ? .green
                                         : .purple,
                                        
-                                       shading: gameCard.cardShading == "solid" ? ViewCardShading.solid.rawValue
-                                        : gameCard.cardShading == "open"  ? ViewCardShading.open.rawValue
-                                        : ViewCardShading.striped.rawValue,
+                                       // translate shading from string to an opacity value of Double
+                                       shading: (gameCard.cardShading == SetGameModel.SetShading.filled.rawValue) ? ViewCardShading.filled.rawValue
+                                        : (gameCard.cardShading == SetGameModel.SetShading.patterened.rawValue)  ? ViewCardShading.patterened.rawValue
+                                        : ViewCardShading.outlined.rawValue,
                                        
                                        isSelected: gameCard.isSelected,
                                        isOneOfThreeSelected: gameCard.isOneOfThreeSelected,
                                        isMatched: gameCard.isMatched,
                                        
-                                       gameState: gameCard.cardState == "inPlay" ? .inPlay
-                                        : gameCard.cardState == "discarded" ? .matchedAndDiscarded
+                                       gameState: (gameCard.cardState == SetGameModel.CardGameState.inPlay.rawValue) ? .inPlay
+                                        : (gameCard.cardState == SetGameModel.CardGameState.disgarded.rawValue) ? .matchedAndDiscarded
                                         : .undealt,
                                        
                                        id: gameCard.id )

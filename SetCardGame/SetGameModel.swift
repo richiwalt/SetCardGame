@@ -61,19 +61,19 @@ struct SetGameModel {
         selectedCards.count == 3
     }
     
-    fileprivate enum SetNumber: String, CaseIterable {
+    enum SetNumber: String, CaseIterable {
         case one, two, three
     }
-    fileprivate enum SetShape: String, CaseIterable {
-        case diamond, squiggle, oval
+    enum SetShape: String, CaseIterable {
+        case firstShape = "diamond", secondShape = "squiggle",  thridShape = "circle"
     }
-    fileprivate enum SetColor: String, CaseIterable {
-        case red, green, purple
+    enum SetColor: String, CaseIterable {
+        case firstColor = "red", secondColor = "green", thirdColor = "purple"
     }
-    fileprivate enum SetShading: String, CaseIterable {
-        case solid, stripe, open
+    enum SetShading: String, CaseIterable {
+        case filled = "opaque", patterened = "transparent", outlined = "outlined"
     }
-    private enum CardGameState: String {
+    enum CardGameState: String {
         case undealt, inPlay, disgarded
     }
     
