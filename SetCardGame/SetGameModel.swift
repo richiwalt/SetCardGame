@@ -231,12 +231,11 @@ struct SetGameModel {
     
     mutating func dealThreeMoreCards() {
         
-        // if three more cards ...
-        // setMatches info is old, update this
-        if deck.count >= 3 {
-            cheatMatch.removeAll()
-            setMatches.removeAll()
-        }
+        // even if deck is out, still refresh
+        // these two for correct end-game processing. 
+        cheatMatch.removeAll()
+        setMatches.removeAll()
+        
         
         // if match is showing when this function is called ...
         if threeCardsAreSelected, checkForMatch(with: selectedCards) {
@@ -381,7 +380,7 @@ struct SetGameModel {
         }
         
         // check if existing cheatMatch is currently good.
-        if cheatMatch.count == 3 && checkForMatch(with: cheatMatch ) {
+        if cheatMatch.count == 3 && checkForMatch(with: cheatMatch ) == true {
             
             
             // select cheat card match one card per turn
