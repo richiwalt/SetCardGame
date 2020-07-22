@@ -9,7 +9,7 @@
 import Foundation
 
 
-/// Combinations for N Chose k.
+/// Find Combinations for n(Cr) , or N Chose k.
 ///
 ///
 func combinations<T>(itemsN: [T], chooseK : Int) -> [[T]] {
@@ -51,10 +51,10 @@ struct SetGameModel {
     
     private var deck: [SetCard]
     private(set) var dealtCards = [SetCard]()
-    private var setMatches = Set<Set<Int>>()   // indices of Set matches; :set elliminates duplicates
-    private var disgardedCards = [SetCard]()
-    
-    private var cheatMatch = [SetCard]()
+    private var setMatches = Set<Set<Int>>()   // a Set of Sets (SoS) of indices for Set-Matches (sorry, too much fun with this one.)
+    private var cheatMatch = [SetCard]()       // one selected set matching cards, ready to go for cheat mode.
+
+    private var disgardedCards = [SetCard]()   // TODO: this is not used, should clean up code to get rid of this.
     
     private var selectedCards: [SetCard] {
         dealtCards.filter { $0.isSelected }
@@ -128,8 +128,9 @@ struct SetGameModel {
     }
     
     
-    // Utility Function to Deselect all Selected Gards ...
-    // Called when SetGame.tryAgain is true
+    /// DeSelects all selected cards.
+    ///
+    /// Utility function
     private mutating func deselectAllSelected() {
         
         for selectedCard in selectedCards {
@@ -141,14 +142,18 @@ struct SetGameModel {
         
     }
     
-    
+    /// Toggles Selected/Deselected state of a Set Card
+    ///
+    /// Utility function.
     private mutating func toggleSelectedAttribute(for card: SetCard) {
         if let firstIndex = dealtCards.firstIndex(where: { $0.id == card.id  }) {
             dealtCards[firstIndex].isSelected = !dealtCards[ firstIndex ].isSelected
         }
     }
     
-    
+    /// Rearranges Dealt Cards.
+    ///
+    /// Perhaps seeing cards in different arrangement will enable seeing set possibilities  better.
     mutating func rearrangeDealtCards() {
         gameComments = "Shuffling ..."
         dealtCards.shuffle()
@@ -166,18 +171,19 @@ struct SetGameModel {
         // Process three cards already selected from last time ...
         if threeCardsAreSelected {
             
-            // for match
+            // process a match
             if checkForMatch(with: selectedCards) {
                 dealThreeMoreCards()
-                cheatMatch.removeAll()
+                cheatMatch.removeAll() // whether user-found match, or cheat-found match, clear cheatMatch as new dealtCards state will follow.
                 toggleSelectedAttribute(for: card)
                 
             } else {  // process a non-match
                 gameComments = ""
                 deselectAllSelected()
-                cheatMatch.removeAll()
                 toggleSelectedAttribute(for: card)
             }
+            
+            // whether match or not, RETURN ...
             return
         }
         
@@ -185,12 +191,12 @@ struct SetGameModel {
         toggleSelectedAttribute(for: card)
         
         
-        // print game comments of selected cards
+        // print game comments for all selected cards
         for card in selectedCards {
             gameComments += "\(card.cardNumber.capitalized)-\(card.cardColor.capitalized)-\(card.cardShape.capitalized)-\(card.cardShading.capitalized) \n"
         }
         
-        // if three are NOW selected with this card ...
+        // if three are NOW selected (with the selection of THIS card ) ...
         if threeCardsAreSelected {
             
             // first update Card's isOneOfThreeSelected attribute ..
@@ -202,7 +208,6 @@ struct SetGameModel {
             
             // process for match
             if checkForMatch(with: selectedCards ) == true {
-                cheatMatch.removeAll()
                 gameComments = "😃😃😃😃😃😃😃😃"
                 score += 1
                 
@@ -232,7 +237,11 @@ struct SetGameModel {
     
     mutating func dealThreeMoreCards() {
         
-        findCardSetsInDealtCards()
+        // if three more cards ...
+        // setMatches info is old, update this
+        if deck.count >= 3 {
+            setMatches.removeAll()
+        }
         
         // if match is showing when this function is called ...
         if threeCardsAreSelected, checkForMatch(with: selectedCards) {
@@ -266,7 +275,7 @@ struct SetGameModel {
                 dealtCards.append( deck.removeFirst() )
             }
         }
-        gameComments = "Adding 3 More Cards. (Undealt: \(deck.count)  In Play: \(dealtCards.count)  Sets: \(score)/27)"
+        gameComments = "Undealt: \(deck.count)  In Play: \(dealtCards.count)  Sets: \(score)/27"
     }
     
     
@@ -328,11 +337,29 @@ struct SetGameModel {
     }
     
     
-    /// Index of Card that completes a Set Match.
+    
+    
+    /// If Cheating, deselect user-selected cards.
+    ///
+    /// Helper function
+    private mutating func unselectCardsNotInCheatMatch() {
+        assert( cheatMatch.count == 3, "Cheat match does not seem to be loaded with any indicies" )
+        
+        for card in selectedCards {
+            if !cheatMatch.contains(where: { $0.id == card.id }) {
+                let cardIndex = dealtCards.firstIndex { $0.id == card.id }
+                dealtCards[cardIndex!].isSelected = false
+            }
+        }
+        
+    }
+    
+    
+    /// Computes Index of Card that completes a Set Match.
     ///
     ///  Helpter function to find the third matching card index of a card pair comnination.
     /// - Parameter firstTwoCards: an array that holds two Set cards.
-    func matchingCardIndex(for firstTwoCards: [SetCard], in cardDeck: [SetCard]) -> Int? {
+    private func matchingCardIndex(for firstTwoCards: [SetCard], in cardDeck: [SetCard]) -> Int? {
         guard let first = cardDeck.firstIndex(where: {
             $0.cardNumber == firstTwoCards.missingSetNumber() &&
             $0.cardShape == firstTwoCards.missingSetShape() &&
@@ -342,10 +369,16 @@ struct SetGameModel {
     }
     
     
-    /// Searches DealtCards for Cheat Match.
+    /// Searches DealtCards for a Match.
     ///
+    /// This function provides _incremental hints._
+    /// - First call will print available Set matches in dealt cards, and load a random Matching Set into global cheatMatch array
+    /// - If **cheatMatch** has not been cleared elsewhere, second call will select  the first card of the match for the user.
+    /// - if **cheatMatch** has not been cleared elsewhere, third call will select the second card of the match for the user.
+    /// - if **cheatmatch** has not been cleared elsewhere, fourth call will select the third card of the match for the user.
     ///
-    mutating func findCardSetsInDealtCards() {
+    /// processing a match in selectCard(_ card: SetCard) will clear cheatMatch array and restart incremental processing.
+    mutating func getMatchingHint() {
         
         if threeCardsAreSelected {
             gameComments = "Tap any Card to Continue ..."
@@ -355,16 +388,29 @@ struct SetGameModel {
         // check if existing cheatMatch is currently good.
         if cheatMatch.count == 3 && checkForMatch(with: cheatMatch ) {
             
+            
+            // select cheat card match one card per turn
             for card in cheatMatch {
-                let index = dealtCards.firstIndex( where: { $0.cardNumber == card.cardNumber && $0.cardColor == card.cardColor && $0.cardShape == card.cardShape && $0.cardShading == card.cardShading } )
                 
+                // first, unselect any user-selected cards,
+                // that are not in the cheat match.
+                unselectCardsNotInCheatMatch()
+                
+                
+                let index = dealtCards.firstIndex( where: { $0.cardNumber == card.cardNumber &&
+                                $0.cardColor == card.cardColor &&
+                                $0.cardShape == card.cardShape &&
+                                $0.cardShading == card.cardShading } )
+                
+                // only select the first non-selected card, then exit the function
+                // let select(card: Setcard) handle normal processing details.
                 if dealtCards[index!].isSelected == false {
                     select(card: card )
                     return
                 }
             }
             
-        } else { // load a new cheat.
+        } else { // find a new cheat matches.
                     
             let twoCardCombinations = combinations(itemsN: dealtCards, chooseK: 2)
             var tempMatch = Set<Int>()
@@ -398,7 +444,7 @@ struct SetGameModel {
         default: gameComments = "There are \(setMatches.count) sets in the dealt cards above."
         }
         
-        gameComments += " Tap eyeglasses for even more help."
+        gameComments += "Tap eyeglasses for additional help."
         
 
     }
@@ -425,6 +471,12 @@ struct SetGameModel {
 }
 
 
+// Extensions for Array used for Set Card Game Model
+
+
+/// Returns True if size of array is two.
+///
+/// **isNotASet** may be used after filtering an array for a card attribute
 extension Array {
     var isNotASet: Bool {
         self.count == 2 ? true : false
@@ -432,6 +484,14 @@ extension Array {
 }
 
 
+/// Given two cards, extended Array function to calculate third card's necessary attribute.
+///
+/// May be used in session as:
+/// guard let indexOfMatching = cardDeck.firstIndex(where: {
+///       $0.cardNumber == firstTwoCards.missingSetNumber() &&
+///       $0.cardShape == firstTwoCards.missingSetShape() &&
+///       $0.cardColor == firstTwoCards.missingSetColor() &&
+///       $0.cardShading == firstTwoCards.missingSetFill()    })  else { return nil }
 extension Array where Element == SetGameModel.SetCard {
     
     func missingSetShape() -> String? {

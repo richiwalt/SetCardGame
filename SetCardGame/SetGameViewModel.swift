@@ -135,7 +135,7 @@ class SetGameViewModel: ObservableObject {
     }
     
     func findMatches() {
-        game.findCardSetsInDealtCards()
+        game.getMatchingHint()
     }
     
     func rearrangeCardsForView() {
