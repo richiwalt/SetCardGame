@@ -53,86 +53,21 @@ struct SetCardGameView: View {
         
         return ZStack {
             
-            LinearGradient(gradient: Gradient(colors: self.viewModel.theme.colorGradient ), startPoint: .topLeading, endPoint: .bottomTrailing).edgesIgnoringSafeArea(.all)
+            // Fill the background with a gradient.
+            LinearGradient(gradient: Gradient(
+                           colors: self.viewModel.theme.colorGradient
+                           ),
+                           startPoint: .topLeading,
+                           endPoint: .bottomTrailing).edgesIgnoringSafeArea(.all)
             
             
             GeometryReader { geometry in
                 
                 VStack {
                     
-                    HStack {
-                        
-                        
-                        
-                        Text(" ") // used as a small spacer
-                        
-                        // New Game
-                        Button(action: {
-                            withAnimation(.easeInOut(duration: 0.75)) {
-                                self.viewModel.createNewGame()
-                            }
-                            
-                        }) { Image(systemName: "arrow.counterclockwise") }
-                        .font(.system(size: 22.0))
-                        Spacer()
-                        
-                        // Change Theme
-                        Button(action: {
-                            withAnimation(.easeInOut(duration: 0.75)) {
-                                self.viewModel.changeTheme()
-                            }
-                            
-                        }) { Image(systemName: "paintbrush") }
-                        .font(.system(size: 22.0))
-                            //.font(.headline)
-
-                        Spacer()
-                        
-                        // Deal Three Cards
-                        Button(action: {
-                            withAnimation {
-                                self.viewModel.callModelDealThreeMoreCards()
-                            }
-                            
-                        }) { Image(systemName: "rectangle.stack.badge.plus") }
-                        .font(.system(size: 22.0))
-                            .foregroundColor(self.viewModel.noRemainingCards ?  .white : .white)
-                            .disabled(self.viewModel.noRemainingCards)
-                        
-                        Spacer()
-                        
-                        
-                        // Rearrange
-                        Button(action: {
-                            withAnimation(.easeIn(duration: 0.85)) {
-                                self.viewModel.rearrangeCardsForView()
-                            }
-                            
-                        }) { Image(systemName: "shuffle") }
-                        .font(.system(size: 22.0))
-                        
-                        Spacer()
-                        
-                        // Rearrange
-                        Button(action: {
-                            withAnimation(.easeIn(duration: 0.85)) {
-                                self.viewModel.findMatches()
-                            }
-                            
-                        }) { Image(systemName: "eyeglasses") }
-                        .font(.system(size: 22.0))
-                        
-                        
-                        // Score
-                        // Text("Sets: \(self.viewModel.score)/27").animation(.none)
-                  
-                        
-                    }
-                    .foregroundColor(.white)
-                    
+                    topRowGuiView(viewModel: self.viewModel )
                     
                     Grid(self.viewModel.cards) { card in
-                        
                         SetCard(card: card)
                             // i think .transition( works here because card is Identifiable ...
                             .transition( .offset(self.disgardTo) ).animation(.easeInOut(duration: 0.6))
@@ -142,9 +77,6 @@ struct SetCardGameView: View {
                                 }
                         }
                     }
-                        
-                        
-                        
                     .frame(width: geometry.size.width, height: geometry.size.height * 0.85 )
                     
                     Spacer()
@@ -155,13 +87,94 @@ struct SetCardGameView: View {
                         .multilineTextAlignment(.center)
                         .foregroundColor(.white)
                    
+                }  // VStack
+                
+            }   // GeometryReader
+            .padding()
+            
+        }   // ZStack
+    }   //  body
+}
+
+
+
+struct topRowGuiView: View {
+    
+    var viewModel: SetGameViewModel
+    
+    var body: some View {
+    
+        HStack {
+            
+            Text(" ") // used as a small spacer
+            
+            // New Game
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.75)) {
+                    self.viewModel.createNewGame()
                 }
                 
-            }
-            .padding()
+            }) { Image(systemName: "arrow.counterclockwise") }
+                .font(.system(size: 22.0))
+            Spacer()
+            
+            // Change Theme
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.75)) {
+                    self.viewModel.changeTheme()
+                }
+                
+            }) { Image(systemName: "paintbrush") }
+                .font(.system(size: 22.0))
+            //.font(.headline)
+            
+            Spacer()
+            
+            // Deal Three Cards
+            Button(action: {
+                withAnimation {
+                    self.viewModel.callModelDealThreeMoreCards()
+                }
+                
+            }) { Image(systemName: "rectangle.stack.badge.plus") }
+                .font(.system(size: 22.0))
+                .foregroundColor(self.viewModel.noRemainingCards ?  .white : .white)
+                .disabled(self.viewModel.noRemainingCards)
+            
+            Spacer()
+            
+            
+            // Rearrange
+            Button(action: {
+                withAnimation(.easeIn(duration: 0.85)) {
+                    self.viewModel.rearrangeCardsForView()
+                }
+                
+            }) { Image(systemName: "shuffle") }
+                .font(.system(size: 22.0))
+            
+            Spacer()
+            
+            // Rearrange
+            Button(action: {
+                withAnimation(.easeIn(duration: 0.85)) {
+                    self.viewModel.findMatches()
+                }
+                
+            }) { Image(systemName: "eyeglasses") }
+                .font(.system(size: 22.0))
+            
+            
+            // Score
+            // Text("Sets: \(self.viewModel.score)/27").animation(.none)
+            
+            
         }
+    .foregroundColor(.white)
+        
     }
 }
+
 
 
 
